@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceFlow - Financial Scenario Planner</title>
+    <link rel="stylesheet" href="css/index-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">💰 FinanceFlow</div>
+            <div class="nav-menu">
+                <div class="nav-item active" onclick="loadPage('income.html', this)">
+                    📈 Income
+                </div>
+                <div class="nav-item" onclick="loadPage('expense.html', this)">
+                    📉 Expenses
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header>
+                <h1>FinanceFlow</h1>
+                <p>Manage your income and expenses for financial scenarios</p>
+            </header>
+
+            <div class="content">
+                <iframe id="pageContent" src="income.html"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+
+</body>
+</html>

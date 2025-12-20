@@ -1,0 +1,56 @@
+function loadPage(page, element) {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    element.classList.add('active');
+
+    document.getElementById('pageContent').src = page;
+}
+
+function showMessage(elementId, text, type) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    el.textContent = text;
+    el.className = `message ${type}`;
+    el.style.display = 'block';
+
+    setTimeout(() => {
+        el.style.display = 'none';
+    }, 4000);
+}
+
+function getFrequencyText(frequency) {
+    const map = {
+        monthly: 'Monthly',
+        yearly: 'Yearly',
+        once: 'One-time'
+    };
+    return map[frequency] || frequency;
+}
+
+function getCategoryText(category) {
+    const map = {
+        housing: '🏠 Housing',
+        groceries: '🛒 Groceries',
+        transport: '🚗 Transport',
+        insurance: '🛡️ Insurance',
+        other: '📦 Other'
+    };
+    return map[category] || category;
+}
+
+function formatCurrency(amount) {
+    return `€ ${Number(amount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
+}
+
+function getIncome() {
+    return JSON.parse(localStorage.getItem('income')) || [];
+}
+
+function getExpenses() {
+    return JSON.parse(localStorage.getItem('expenses')) || [];
+}
