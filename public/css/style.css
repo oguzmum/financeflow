@@ -200,3 +200,40 @@ button:active {
     font-size: 3em;
     margin-bottom: 15px;
 }
+
+/* ============================================
+   TEMPLATE BUILDER
+   ============================================ */
+
+.template-income-picker {
+    margin: 15px 0 25px;
+}
+
+.template-income-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.template-income-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.template-income-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 6px 15px rgba(102, 126, 234, 0.15);
+}
+
+.template-income-card input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}

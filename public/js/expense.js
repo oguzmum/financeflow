@@ -9,12 +9,9 @@ function addEntry() {
     const name = document.getElementById('name').value;
     const amount = parseFloat(document.getElementById('amount').value);
     const category = document.getElementById('category').value;
-    const frequency = document.getElementById('frequency').value;
-    const startMonth = parseInt(document.getElementById('startMonth').value);
-    const startYear = parseInt(document.getElementById('startYear').value);
     const description = document.getElementById('description').value;
 
-    if (!name || !amount || !startMonth || !startYear) {
+    if (!name || !amount) {
         showMessage('message', 'Please fill in all required fields.', 'error');
         return;
     }
@@ -24,9 +21,6 @@ function addEntry() {
         name,
         amount,
         category,
-        frequency,
-        startMonth,
-        startYear,
         description
     };
 
@@ -68,8 +62,8 @@ function render() {
                 <div class="entry-info">
                     <div class="entry-name">${e.name}</div>
                     <div class="entry-details">
-                        ${getCategoryText(e.category)} •
-                        ${getFrequencyText(e.frequency)} starting ${e.startMonth}/${e.startYear}
+                        ${getCategoryText(e.category)}
+                        ${e.description ? ` • ${e.description}` : ''}
                     </div>
                 </div>
                 <div class="entry-amount">${formatCurrency(e.amount)}</div>

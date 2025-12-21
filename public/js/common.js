@@ -20,15 +20,6 @@ function showMessage(elementId, text, type) {
     }, 4000);
 }
 
-function getFrequencyText(frequency) {
-    const map = {
-        monthly: 'Monthly',
-        yearly: 'Yearly',
-        once: 'One-time'
-    };
-    return map[frequency] || frequency;
-}
-
 function getCategoryText(category) {
     const map = {
         housing: '🏠 Housing',
@@ -53,4 +44,8 @@ function getIncome() {
 
 function getExpenses() {
     return JSON.parse(localStorage.getItem('expenses')) || [];
+}
+
+function getIncomeTemplates() {
+    return JSON.parse(localStorage.getItem('incomeTemplates')) || [];
 }
