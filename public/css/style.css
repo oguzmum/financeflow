@@ -436,3 +436,42 @@ th {
     color: #6b7280;
     margin-top: 4px;
 }
+
+
+/* ============================================
+   TEMPLATE
+   ============================================ */
+
+.template-checklist {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.template-check-item {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.template-check-item:hover {
+  background: #f3f4ff;
+}
+
+.template-check-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.template-check-label {
+  color: #333;
+  font-size: 0.95em;
+}

@@ -90,47 +90,56 @@ function getPresetRange() {
 }
 
 function addPeriodRow(defaults = {}) {
-    const container = document.getElementById('periodsContainer');
-    const row = document.createElement('div');
-    row.className = 'period-row';
-    row.innerHTML = `
-        <div class="form-group">
-            <label>Start Month</label>
-            <input type="month" class="period-start" value="${defaults.start || ''}">
-        </div>
-        <div class="form-group">
-            <label>End Month</label>
-            <input type="month" class="period-end" value="${defaults.end || ''}">
-        </div>
-        <div class="form-group">
-            <label>Income Templates</label>
-            <select class="period-income" multiple size="4"></select>
-            <div class="helper-text">Choose multiple Templates with Strg/Cmd.</div>
-        </div>
-        <div class="form-group">
-            <label>Expense Templates</label>
-            <select class="period-expense" multiple size="4"></select>
-            <div class="helper-text">Choose multiple Templates with Strg/Cmd.</div>
-        </div>
-        <div class="form-group period-actions">
-            <button type="button" class="btn-delete remove-period">Remove</button>
-        </div>
-    `;
+  const container = document.getElementById('periodsContainer');
+  const row = document.createElement('div');
+  row.className = 'period-row';
 
-    container.appendChild(row);
+  row.innerHTML = `
+    <div class="form-group">
+      <label>Start Month</label>
+      <input type="month" class="period-start" value="${defaults.start || ''}">
+    </div>
 
-    const incomeSelect = row.querySelector('.period-income');
-    const expenseSelect = row.querySelector('.period-expense');
-    incomeSelect.innerHTML = buildTemplateOptions(incomeTemplates);
-    expenseSelect.innerHTML = buildTemplateOptions(expenseTemplates);
+    <div class="form-group">
+      <label>End Month</label>
+      <input type="month" class="period-end" value="${defaults.end || ''}">
+    </div>
 
-    setSelectedValues(incomeSelect, defaults.incomeTemplateIds || []);
-    setSelectedValues(expenseSelect, defaults.expenseTemplateIds || []);
+    <div class="form-group">
+      <label>Income Templates</label>
+      <div class="template-checklist income-checklist"></div>
+    </div>
 
-    row.querySelector('.remove-period').addEventListener('click', () => {
-        row.remove();
-    });
+    <div class="form-group">
+      <label>Expense Templates</label>
+      <div class="template-checklist expense-checklist"></div>
+    </div>
+
+    <div class="form-group period-actions">
+      <button type="button" class="btn-delete remove-period">Remove</button>
+    </div>
+  `;
+
+  container.appendChild(row);
+
+  // WICHTIG: erst NACH appendChild rendern
+  renderTemplateChecklist(
+    row.querySelector('.income-checklist'),
+    incomeTemplates,
+    defaults.incomeTemplateIds || [],
+    'income'
+  );
+
+  renderTemplateChecklist(
+    row.querySelector('.expense-checklist'),
+    expenseTemplates,
+    defaults.expenseTemplateIds || [],
+    'expense'
+  );
+
+  row.querySelector('.remove-period').addEventListener('click', () => row.remove());
 }
+
 
 function monthRange(start, end) {
     const [startYear, startMonth] = start.split('-').map(Number);
@@ -181,14 +190,20 @@ function templateNames(templates, templateIds) {
     return names.length ? names.join(', ') : 'Templates nicht gefunden';
 }
 
+function getCheckedIds(row, selector) {
+  return Array.from(row.querySelectorAll(selector + ':checked'))
+    .map(cb => Number(cb.value))
+    .filter(Boolean);
+}
+
 function collectPeriods() {
-    const rows = Array.from(document.querySelectorAll('.period-row'));
-    return rows.map(row => ({
-        start: row.querySelector('.period-start').value,
-        end: row.querySelector('.period-end').value,
-        incomeTemplateIds: getSelectedTemplateIds(row.querySelector('.period-income')),
-        expenseTemplateIds: getSelectedTemplateIds(row.querySelector('.period-expense'))
-    }));
+  const rows = Array.from(document.querySelectorAll('.period-row'));
+  return rows.map(row => ({
+    start: row.querySelector('.period-start').value,
+    end: row.querySelector('.period-end').value,
+    incomeTemplateIds: getCheckedIds(row, '.income-template-checkbox'),
+    expenseTemplateIds: getCheckedIds(row, '.expense-template-checkbox'),
+  }));
 }
 
 async function savePeriods() {
@@ -336,6 +351,30 @@ function renderTable(rows, startingBalance, periods) {
 
 function formatMonth(date) {
     return date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+}
+
+function renderTemplateChecklist(containerEl, templates, selectedIds = [], kind = 'income') {
+  const selectedSet = new Set((selectedIds || []).map(Number));
+
+  if (!templates || !templates.length) {
+    containerEl.innerHTML = `<div class="helper-text">No templates available.</div>`;
+    return;
+  }
+
+  containerEl.innerHTML = templates.map(t => {
+    const checked = selectedSet.has(Number(t.id)) ? 'checked' : '';
+    return `
+      <label class="template-check-item">
+        <input
+          type="checkbox"
+          class="${kind}-template-checkbox"
+          value="${t.id}"
+          ${checked}
+        />
+        <span class="template-check-label">${t.name}</span>
+      </label>
+    `;
+  }).join('');
 }
 
 
