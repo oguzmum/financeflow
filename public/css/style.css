@@ -93,6 +93,12 @@ button:active {
     transform: translateY(0);
 }
 
+.btn-secondary {
+    background: #eef2ff;
+    color: #4c51bf;
+    box-shadow: none;
+}
+
 .btn-delete {
     background: #f44336;
     padding: 8px 15px;
@@ -392,4 +398,31 @@ th {
 
 .text-right {
     text-align: right;
+}
+
+/* Longterm detail periods */
+.periods-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.period-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    align-items: end;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 10px;
+}
+
+.period-actions {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
 }

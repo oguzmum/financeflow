@@ -16,30 +16,20 @@
             </div>
         </div>
 
-        <div class="form-row three">
-            <div class="form-group">
-                <label>Start Month</label>
-                <input type="month" id="startMonth">
-            </div>
-            <div class="form-group">
-                <label>End Month</label>
-                <input type="month" id="endMonth">
-            </div>
-            <div class="form-group">
-                <label>Starting Balance (€)</label>
-                <input type="number" id="startingBalance" value="0" step="0.01">
-            </div>
+        <div class="form-group">
+            <label>Starting Balance (€)</label>
+            <input type="number" id="startingBalance" value="0" step="0.01">
         </div>
 
-        <div class="form-row three">
-            <div class="form-group">
-                <label>Income Template</label>
-                <select id="incomeTemplate"></select>
+        <div class="form-group">
+            <div class="periods-header">
+                <label>Periods & Templates</label>
+                <button type="button" class="btn-secondary" onclick="addPeriodRow()">+ add Period</button>
             </div>
-            <div class="form-group">
-                <label>Expense Template</label>
-                <select id="expenseTemplate"></select>
-            </div>
+            <div id="periodsContainer"></div>
+        </div>
+
+        <div class="form-row" style="margin-top:10px;">
             <div class="form-group" style="align-self:flex-end;">
                 <button onclick="generateProjection()" class="btn-calculate">Create Table</button>
             </div>
