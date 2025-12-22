@@ -260,11 +260,16 @@ function toggleAnnualMonth(forceVisible) {
 }
 
 function formatExpenseSchedule(expense) {
-    if (!expense?.is_annual_payment) return '• Monatlich';
+    if (!expense?.is_annual_payment) return '• Monthly';
+
     const monthNames = [
-        'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
-        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    const monthName = monthNames[(Number(expense.annual_month) || 1) - 1] || 'Monat unbekannt';
-    return `• Jährlich im ${monthName}`;
+
+    const monthName =
+        monthNames[(Number(expense.annual_month) || 1) - 1] || 'Unknown month';
+
+    return `• Yearly in ${monthName}`;
 }
+
