@@ -5,8 +5,18 @@ let incomeEntries = [];
 let expenseEntries = [];
 
 function buildTemplateOptions(templates) {
-    return `<option value="">(None)</option>` +
-        templates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    return templates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+}
+
+function setSelectedValues(selectEl, values = []) {
+    const valueSet = new Set((values || []).map(Number));
+    Array.from(selectEl.options).forEach(option => {
+        option.selected = valueSet.has(Number(option.value));
+    });
+}
+
+function getSelectedTemplateIds(selectEl) {
+    return Array.from(selectEl.selectedOptions).map(option => Number(option.value));
 }
 
 async function initDetail() {
@@ -47,8 +57,8 @@ async function initDetail() {
             plan.periods.forEach(period => addPeriodRow({
                 start: toMonthInput(period.start_month),
                 end: toMonthInput(period.end_month),
-                incomeTemplateId: period.income_template_id || '',
-                expenseTemplateId: period.expense_template_id || ''
+                incomeTemplateIds: period.income_template_ids || [],
+                expenseTemplateIds: period.expense_template_ids || []
             }));
         } else {
             addPeriodRow(getPresetRange());
@@ -93,12 +103,14 @@ function addPeriodRow(defaults = {}) {
             <input type="month" class="period-end" value="${defaults.end || ''}">
         </div>
         <div class="form-group">
-            <label>Income Template</label>
-            <select class="period-income"></select>
+            <label>Income Templates</label>
+            <select class="period-income" multiple size="4"></select>
+            <div class="helper-text">Mehrere Templates mit Strg/Cmd auswählen.</div>
         </div>
         <div class="form-group">
-            <label>Expense Template</label>
-            <select class="period-expense"></select>
+            <label>Expense Templates</label>
+            <select class="period-expense" multiple size="4"></select>
+            <div class="helper-text">Mehrere Templates mit Strg/Cmd auswählen.</div>
         </div>
         <div class="form-group period-actions">
             <button type="button" class="btn-delete remove-period">Remove</button>
@@ -112,8 +124,8 @@ function addPeriodRow(defaults = {}) {
     incomeSelect.innerHTML = buildTemplateOptions(incomeTemplates);
     expenseSelect.innerHTML = buildTemplateOptions(expenseTemplates);
 
-    if (defaults.incomeTemplateId !== undefined) incomeSelect.value = defaults.incomeTemplateId;
-    if (defaults.expenseTemplateId !== undefined) expenseSelect.value = defaults.expenseTemplateId;
+    setSelectedValues(incomeSelect, defaults.incomeTemplateIds || []);
+    setSelectedValues(expenseSelect, defaults.expenseTemplateIds || []);
 
     row.querySelector('.remove-period').addEventListener('click', () => {
         row.remove();
@@ -139,13 +151,20 @@ function monthRange(start, end) {
     return months;
 }
 
-function templateSum(templateId, entries, templates, entryKey) {
-    if (!templateId) return 0;
-    const template = templates.find(t => t.id === Number(templateId));
-    if (!template) return 0;
-    const ids = new Set((template[entryKey] || []).map(item => item.id));
+function templateSum(templateIds, entries, templates, entryKey) {
+    if (!templateIds || !templateIds.length) return 0;
+
+    const entryIds = new Set();
+    templateIds.forEach(id => {
+        const template = templates.find(t => t.id === Number(id));
+        if (!template) return;
+        (template[entryKey] || []).forEach(item => entryIds.add(item.id));
+    });
+
+    if (!entryIds.size) return 0;
+
     return entries
-        .filter(e => ids.has(e.id))
+        .filter(e => entryIds.has(e.id))
         .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 }
 
@@ -153,10 +172,13 @@ function monthKey(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function templateName(templates, templateId) {
-    if (!templateId) return 'Kein Template';
-    const template = templates.find(t => t.id === Number(templateId));
-    return template ? template.name : 'Template nicht gefunden';
+function templateNames(templates, templateIds) {
+    if (!templateIds || !templateIds.length) return 'Keine Templates';
+    const names = templateIds
+        .map(id => templates.find(t => t.id === Number(id)))
+        .filter(Boolean)
+        .map(t => t.name);
+    return names.length ? names.join(', ') : 'Templates nicht gefunden';
 }
 
 function collectPeriods() {
@@ -164,8 +186,8 @@ function collectPeriods() {
     return rows.map(row => ({
         start: row.querySelector('.period-start').value,
         end: row.querySelector('.period-end').value,
-        incomeTemplateId: row.querySelector('.period-income').value,
-        expenseTemplateId: row.querySelector('.period-expense').value
+        incomeTemplateIds: getSelectedTemplateIds(row.querySelector('.period-income')),
+        expenseTemplateIds: getSelectedTemplateIds(row.querySelector('.period-expense'))
     }));
 }
 
@@ -186,8 +208,8 @@ async function savePeriods() {
         payload.push({
             start_month: period.start,
             end_month: period.end,
-            income_template_id: period.incomeTemplateId ? Number(period.incomeTemplateId) : null,
-            expense_template_id: period.expenseTemplateId ? Number(period.expenseTemplateId) : null
+            income_template_ids: period.incomeTemplateIds,
+            expense_template_ids: period.expenseTemplateIds
         });
     }
 
@@ -226,8 +248,8 @@ function generateProjection() {
             return;
         }
 
-        const monthlyIncome = templateSum(period.incomeTemplateId, incomeEntries, incomeTemplates, 'incomes');
-        const monthlyExpense = templateSum(period.expenseTemplateId, expenseEntries, expenseTemplates, 'expenses');
+        const monthlyIncome = templateSum(period.incomeTemplateIds, incomeEntries, incomeTemplates, 'incomes');
+        const monthlyExpense = templateSum(period.expenseTemplateIds, expenseEntries, expenseTemplates, 'expenses');
 
         months.forEach(date => {
             const key = monthKey(date);
@@ -271,8 +293,8 @@ function renderTable(rows, startingBalance, periods) {
     }
 
     const periodSummary = periods.map((p, idx) => {
-        const incomeName = templateName(incomeTemplates, p.incomeTemplateId);
-        const expenseName = templateName(expenseTemplates, p.expenseTemplateId);
+        const incomeName = templateNames(incomeTemplates, p.incomeTemplateIds);
+        const expenseName = templateNames(expenseTemplates, p.expenseTemplateIds);
         return `#${idx + 1}: ${p.start} → ${p.end} • Income: ${incomeName} • Expense: ${expenseName}`;
     }).join('<br>');
 

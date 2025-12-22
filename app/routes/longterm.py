@@ -2,11 +2,18 @@ from datetime import date, datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, ValidationInfo
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, ValidationInfo
 from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
-from app.models import ExpenseTemplate, IncomeTemplate, LongtermPeriod, LongtermPlan
+from app.models import (
+    ExpenseTemplate,
+    IncomeTemplate,
+    LongtermPeriod,
+    LongtermPeriodExpenseTemplateLink,
+    LongtermPeriodIncomeTemplateLink,
+    LongtermPlan,
+)
 
 
 def _month_to_date(month_value: str) -> date:
@@ -20,8 +27,21 @@ def _month_to_date(month_value: str) -> date:
 class LongtermPeriodPayload(BaseModel):
     start_month: str = Field(..., pattern=r"^\d{4}-\d{2}$")
     end_month: str = Field(..., pattern=r"^\d{4}-\d{2}$")
-    income_template_id: Optional[int] = None
-    expense_template_id: Optional[int] = None
+    income_template_ids: List[int] = Field(default_factory=list)
+    expense_template_ids: List[int] = Field(default_factory=list)
+
+    @field_validator("income_template_ids", "expense_template_ids")
+    @classmethod
+    def ensure_unique(cls, values: List[int]) -> List[int]:
+        seen = set()
+        duplicates = set()
+        for value in values:
+            if value in seen:
+                duplicates.add(value)
+            seen.add(value)
+        if duplicates:
+            raise ValueError(f"Duplicate template IDs found: {sorted(duplicates)}")
+        return values
 
     @field_validator("end_month")
     @classmethod
@@ -55,8 +75,16 @@ class LongtermPeriodRead(BaseModel):
     id: int
     start_month: date
     end_month: date
-    income_template_id: Optional[int]
-    expense_template_id: Optional[int]
+
+    @computed_field
+    @property
+    def income_template_ids(self) -> List[int]:
+        return [link.template_id for link in getattr(self, "income_templates", [])]
+
+    @computed_field
+    @property
+    def expense_template_ids(self) -> List[int]:
+        return [link.template_id for link in getattr(self, "expense_templates", [])]
 
 
 class LongtermPlanDetail(LongtermPlanRead):
@@ -86,6 +114,9 @@ def get_plan(plan_id: int, db: Session = Depends(get_db)) -> LongtermPlan:
         db.query(LongtermPlan)
         .options(
             joinedload(LongtermPlan.periods)
+            .joinedload(LongtermPeriod.income_templates),
+            joinedload(LongtermPlan.periods)
+            .joinedload(LongtermPeriod.expense_templates),
         )
         .filter(LongtermPlan.id == plan_id)
         .first()
@@ -120,8 +151,8 @@ def replace_periods(
     if plan is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
 
-    income_template_ids = {item.income_template_id for item in payload if item.income_template_id}
-    expense_template_ids = {item.expense_template_id for item in payload if item.expense_template_id}
+    income_template_ids = {template_id for item in payload for template_id in item.income_template_ids}
+    expense_template_ids = {template_id for item in payload for template_id in item.expense_template_ids}
 
     if income_template_ids:
         found_income_templates = {t.id for t in db.query(IncomeTemplate).filter(IncomeTemplate.id.in_(income_template_ids))}
@@ -152,13 +183,28 @@ def replace_periods(
         period = LongtermPeriod(
             start_month=start_month,
             end_month=end_month,
-            income_template_id=period_payload.income_template_id,
-            expense_template_id=period_payload.expense_template_id,
+            income_templates=[
+                LongtermPeriodIncomeTemplateLink(template_id=template_id)
+                for template_id in period_payload.income_template_ids
+            ],
+            expense_templates=[
+                LongtermPeriodExpenseTemplateLink(template_id=template_id)
+                for template_id in period_payload.expense_template_ids
+            ],
         )
         plan.periods.append(period)
 
     db.add(plan)
     db.commit()
     db.refresh(plan)
-    plan.periods.sort(key=lambda p: (p.start_month, p.id))
+    plan.periods = (
+        db.query(LongtermPeriod)
+        .options(
+            joinedload(LongtermPeriod.income_templates),
+            joinedload(LongtermPeriod.expense_templates),
+        )
+        .filter(LongtermPeriod.plan_id == plan.id)
+        .order_by(LongtermPeriod.start_month, LongtermPeriod.id)
+        .all()
+    )
     return plan

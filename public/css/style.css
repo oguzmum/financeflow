@@ -421,8 +421,18 @@ th {
     margin-bottom: 10px;
 }
 
+.period-row select[multiple] {
+    min-height: 120px;
+}
+
 .period-actions {
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
+}
+
+.helper-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
 }

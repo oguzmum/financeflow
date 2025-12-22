@@ -148,10 +148,62 @@ class LongtermPeriod(Base):
     plan_id = Column(Integer, ForeignKey("longterm_plans.id", ondelete="CASCADE"), nullable=False)
     start_month = Column(Date, nullable=False)
     end_month = Column(Date, nullable=False)
-    income_template_id = Column(Integer, ForeignKey("income_templates.id"), nullable=True)
-    expense_template_id = Column(Integer, ForeignKey("expense_templates.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
     plan = relationship("LongtermPlan", back_populates="periods")
-    income_template = relationship("IncomeTemplate")
-    expense_template = relationship("ExpenseTemplate")
+    income_templates = relationship(
+        "LongtermPeriodIncomeTemplateLink",
+        back_populates="period",
+        cascade="all, delete-orphan",
+    )
+    expense_templates = relationship(
+        "LongtermPeriodExpenseTemplateLink",
+        back_populates="period",
+        cascade="all, delete-orphan",
+    )
+
+
+class LongtermPeriodIncomeTemplateLink(Base):
+    __tablename__ = "longterm_period_income_template_links"
+    __table_args__ = (
+        UniqueConstraint("period_id", "template_id", name="uq_longterm_period_income_template"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    period_id = Column(
+        Integer,
+        ForeignKey("longterm_periods.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    template_id = Column(
+        Integer,
+        ForeignKey("income_templates.id"),
+        nullable=False,
+    )
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    period = relationship("LongtermPeriod", back_populates="income_templates")
+    template = relationship("IncomeTemplate")
+
+
+class LongtermPeriodExpenseTemplateLink(Base):
+    __tablename__ = "longterm_period_expense_template_links"
+    __table_args__ = (
+        UniqueConstraint("period_id", "template_id", name="uq_longterm_period_expense_template"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    period_id = Column(
+        Integer,
+        ForeignKey("longterm_periods.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    template_id = Column(
+        Integer,
+        ForeignKey("expense_templates.id"),
+        nullable=False,
+    )
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    period = relationship("LongtermPeriod", back_populates="expense_templates")
+    template = relationship("ExpenseTemplate")
