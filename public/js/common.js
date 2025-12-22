@@ -5,7 +5,7 @@ function loadPage(page, element) {
     element.classList.add('active');
 
     // cache-busting for iframe content to always load the latest HTML
-    const url = location.hostname === "localhost" ? `${page}?t=${Date.now()}` : page;
+    const url = `${page}?t=${Date.now()}`;
 
     document.getElementById('pageContent').src = url;
 }
@@ -29,6 +29,8 @@ function getCategoryText(category) {
         groceries: '🛒 Groceries',
         transport: '🚗 Transport',
         insurance: '🛡️ Insurance',
+        abonnement: '🔁 Abonnement',
+        health: '🏥 Health',
         other: '📦 Other'
     };
     return map[category] || category;

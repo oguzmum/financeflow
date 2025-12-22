@@ -160,21 +160,42 @@ function monthRange(start, end) {
     return months;
 }
 
-function templateSum(templateIds, entries, templates, entryKey) {
-    if (!templateIds || !templateIds.length) return 0;
+function collectTemplateEntries(templateIds, templates, entryKey) {
+    if (!templateIds || !templateIds.length) return [];
 
-    const entryIds = new Set();
+    const seen = new Set();
+    const collected = [];
+
     templateIds.forEach(id => {
         const template = templates.find(t => t.id === Number(id));
-        if (!template) return;
-        (template[entryKey] || []).forEach(item => entryIds.add(item.id));
+        if (!template || !template[entryKey]) return;
+
+        template[entryKey].forEach(item => {
+            if (seen.has(item.id)) return;
+            seen.add(item.id);
+            collected.push(item);
+        });
     });
 
-    if (!entryIds.size) return 0;
+    return collected;
+}
 
-    return entries
-        .filter(e => entryIds.has(e.id))
-        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+function sumIncomeEntries(entries) {
+    if (!entries || !entries.length) return 0;
+    return entries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+}
+
+function calculateMonthlyExpenses(entries, date) {
+    if (!entries || !entries.length) return 0;
+    const month = date.getMonth() + 1;
+
+    return entries.reduce((sum, expense) => {
+        const amount = Number(expense.amount || 0);
+        if (expense.is_annual_payment) {
+            return sum + (Number(expense.annual_month) === month ? amount : 0);
+        }
+        return sum + amount;
+    }, 0);
 }
 
 function monthKey(date) {
@@ -263,14 +284,15 @@ function generateProjection() {
             return;
         }
 
-        const monthlyIncome = templateSum(period.incomeTemplateIds, incomeEntries, incomeTemplates, 'incomes');
-        const monthlyExpense = templateSum(period.expenseTemplateIds, expenseEntries, expenseTemplates, 'expenses');
+        const periodIncomeEntries = collectTemplateEntries(period.incomeTemplateIds, incomeTemplates, 'incomes');
+        const periodExpenseEntries = collectTemplateEntries(period.expenseTemplateIds, expenseTemplates, 'expenses');
+        const monthlyIncome = sumIncomeEntries(periodIncomeEntries);
 
         months.forEach(date => {
             const key = monthKey(date);
             const existing = monthMap.get(key) || { date: new Date(date), income: 0, expense: 0 };
             existing.income += monthlyIncome;
-            existing.expense += monthlyExpense;
+            existing.expense += calculateMonthlyExpenses(periodExpenseEntries, date);
             monthMap.set(key, existing);
         });
     }

@@ -1,8 +1,12 @@
 let expenses = [];
 let expenseTemplates = [];
 
+console.log("expense.js loaded ✅", window.location.href);
+
+
 async function initExpenses() {
     try {
+        setupAnnualPaymentToggle();
         await Promise.all([loadExpenses(), loadExpenseTemplates()]);
         renderExpenseList();
         renderTemplateExpensePicker();
@@ -26,16 +30,31 @@ async function addEntry() {
     const amount = parseFloat(document.getElementById('amount').value);
     const category = document.getElementById('category').value;
     const description = document.getElementById('description').value.trim();
+    const isAnnualPayment = document.getElementById('isAnnualPayment').checked;
+    const annualMonthValue = document.getElementById('annualMonth').value;
+    const annualMonth = isAnnualPayment && annualMonthValue ? Number(annualMonthValue) : null;
 
     if (!name || !amount) {
         showMessage('message', 'Please fill in all required fields.', 'error');
         return;
     }
 
+    if (isAnnualPayment && !annualMonth) {
+        showMessage('message', 'Bitte Monat für die Jahreszahlung auswählen.', 'error');
+        return;
+    }
+
     try {
         await apiRequest('/expenses', {
             method: 'POST',
-            body: { name, amount, category, description }
+            body: {
+                name,
+                amount,
+                category,
+                description,
+                is_annual_payment: isAnnualPayment,
+                annual_month: annualMonth
+            }
         });
 
         await loadExpenses();
@@ -54,6 +73,11 @@ function clearExpenseForm() {
     document.getElementById('amount').value = '';
     document.getElementById('description').value = '';
     document.getElementById('category').value = 'housing';
+    const checkbox = document.getElementById('isAnnualPayment');
+    const monthSelect = document.getElementById('annualMonth');
+    if (checkbox) checkbox.checked = false;
+    if (monthSelect) monthSelect.value = '';
+    toggleAnnualMonth(false);
 }
 
 async function deleteEntry(id) {
@@ -90,6 +114,7 @@ function renderExpenseList() {
                     <div class="entry-name">${e.name}</div>
                     <div class="entry-details">
                         ${getCategoryText(e.category)}
+                        ${formatExpenseSchedule(e)}
                         ${e.description ? ` • ${e.description}` : ''}
                     </div>
                 </div>
@@ -122,6 +147,7 @@ function renderTemplateExpensePicker() {
                     <div>
                         <div class="entry-name">${entry.name}</div>
                         <div class="entry-details">${getCategoryText(entry.category)}</div>
+                        <div class="entry-details">${formatExpenseSchedule(entry)}</div>
                         <div class="entry-details">${formatCurrency(entry.amount)}</div>
                         ${entry.description ? `<div class="entry-details">${entry.description}</div>` : ''}
                     </div>
@@ -207,5 +233,38 @@ function renderTemplateList() {
     }).join('');
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  initExpenses();
+});
+
+
 // Initialize on load
-initExpenses();
+// initExpenses();
+
+function setupAnnualPaymentToggle() {
+    const checkbox = document.getElementById('isAnnualPayment');
+    if (!checkbox) return;
+    checkbox.addEventListener('change', () => toggleAnnualMonth(checkbox.checked));
+    toggleAnnualMonth(checkbox.checked);
+}
+
+function toggleAnnualMonth(forceVisible) {
+    const monthGroup = document.getElementById('annualMonthGroup');
+    const monthSelect = document.getElementById('annualMonth');
+    if (!monthGroup) return;
+    const show = forceVisible ?? false;
+    monthGroup.style.display = show ? 'block' : 'none';
+    if (!show && monthSelect) {
+        monthSelect.value = '';
+    }
+}
+
+function formatExpenseSchedule(expense) {
+    if (!expense?.is_annual_payment) return '• Monatlich';
+    const monthNames = [
+        'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+    ];
+    const monthName = monthNames[(Number(expense.annual_month) || 1) - 1] || 'Monat unbekannt';
+    return `• Jährlich im ${monthName}`;
+}

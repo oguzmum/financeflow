@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import (
     Column,
+    Boolean,
     Date,
     DateTime,
     ForeignKey,
@@ -40,6 +41,8 @@ class Expense(Base):
     amount = Column(Numeric(12, 2), nullable=False)
     category = Column(String(255), nullable=False, default="other")
     description = Column(Text, nullable=True)
+    is_annual_payment = Column(Boolean, nullable=False, default=False)
+    annual_month = Column(Integer, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
     template_links = relationship(

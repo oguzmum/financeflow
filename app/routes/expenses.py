@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -15,6 +15,17 @@ class ExpenseCreate(BaseModel):
     amount: Decimal = Field(..., gt=0)
     category: str = Field(..., max_length=255)
     description: Optional[str] = None
+    is_annual_payment: bool = False
+    annual_month: Optional[int] = Field(default=None, ge=1, le=12)
+
+    @model_validator(mode="after")
+    def validate_annual_payment(self):
+        if self.is_annual_payment:
+            if self.annual_month is None:
+                raise ValueError("Annual month is required for yearly payments.")
+        else:
+            self.annual_month = None
+        return self
 
 
 class ExpenseRead(BaseModel):
@@ -25,6 +36,8 @@ class ExpenseRead(BaseModel):
     amount: Decimal
     category: str
     description: Optional[str]
+    is_annual_payment: bool
+    annual_month: Optional[int]
     created_at: datetime
 
 
