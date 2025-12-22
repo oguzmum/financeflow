@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, ValidationInfo
+from pydantic import BaseModel, ConfigDict, Field, field_validator, ValidationInfo
 from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
@@ -69,22 +69,23 @@ class LongtermPlanRead(BaseModel):
     created_at: datetime
 
 
+class TemplateSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+
+
 class LongtermPeriodRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     start_month: date
     end_month: date
-
-    @computed_field
-    @property
-    def income_template_ids(self) -> List[int]:
-        return [link.template_id for link in getattr(self, "income_templates", [])]
-
-    @computed_field
-    @property
-    def expense_template_ids(self) -> List[int]:
-        return [link.template_id for link in getattr(self, "expense_templates", [])]
+    income_template_ids: List[int] = Field(default_factory=list)
+    expense_template_ids: List[int] = Field(default_factory=list)
+    income_templates: List[TemplateSummary] = Field(default_factory=list)
+    expense_templates: List[TemplateSummary] = Field(default_factory=list)
 
 
 class LongtermPlanDetail(LongtermPlanRead):
@@ -92,6 +93,37 @@ class LongtermPlanDetail(LongtermPlanRead):
 
 
 router = APIRouter(prefix="/api/longterm", tags=["longterm"])
+
+
+def _serialize_period(period: LongtermPeriod) -> dict:
+    return {
+        "id": period.id,
+        "start_month": period.start_month,
+        "end_month": period.end_month,
+        "income_template_ids": [link.template_id for link in (period.income_templates or [])],
+        "expense_template_ids": [link.template_id for link in (period.expense_templates or [])],
+        "income_templates": [
+            {"id": link.template.id, "name": link.template.name}
+            for link in (period.income_templates or [])
+            if link.template
+        ],
+        "expense_templates": [
+            {"id": link.template.id, "name": link.template.name}
+            for link in (period.expense_templates or [])
+            if link.template
+        ],
+    }
+
+
+def _serialize_plan(plan: LongtermPlan) -> dict:
+    periods = sorted(plan.periods or [], key=lambda p: (p.start_month, p.id))
+    return {
+        "id": plan.id,
+        "name": plan.name,
+        "description": plan.description,
+        "created_at": plan.created_at,
+        "periods": [_serialize_period(p) for p in periods],
+    }
 
 
 @router.get("/plans", response_model=List[LongtermPlanRead])
@@ -109,22 +141,23 @@ def create_plan(payload: LongtermPlanCreate, db: Session = Depends(get_db)) -> L
 
 
 @router.get("/plans/{plan_id}", response_model=LongtermPlanDetail)
-def get_plan(plan_id: int, db: Session = Depends(get_db)) -> LongtermPlan:
+def get_plan(plan_id: int, db: Session = Depends(get_db)) -> dict:
     plan = (
         db.query(LongtermPlan)
         .options(
             joinedload(LongtermPlan.periods)
-            .joinedload(LongtermPeriod.income_templates),
+            .joinedload(LongtermPeriod.income_templates)
+            .joinedload(LongtermPeriodIncomeTemplateLink.template),
             joinedload(LongtermPlan.periods)
-            .joinedload(LongtermPeriod.expense_templates),
+            .joinedload(LongtermPeriod.expense_templates)
+            .joinedload(LongtermPeriodExpenseTemplateLink.template),
         )
         .filter(LongtermPlan.id == plan_id)
         .first()
     )
     if plan is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
-    plan.periods.sort(key=lambda p: (p.start_month, p.id))
-    return plan
+    return _serialize_plan(plan)
 
 
 @router.delete("/plans/{plan_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -141,7 +174,7 @@ def replace_periods(
     plan_id: int,
     payload: List[LongtermPeriodPayload],
     db: Session = Depends(get_db),
-) -> LongtermPlan:
+) -> dict:
     plan = (
         db.query(LongtermPlan)
         .options(joinedload(LongtermPlan.periods))
@@ -200,11 +233,13 @@ def replace_periods(
     plan.periods = (
         db.query(LongtermPeriod)
         .options(
-            joinedload(LongtermPeriod.income_templates),
-            joinedload(LongtermPeriod.expense_templates),
+            joinedload(LongtermPeriod.income_templates)
+            .joinedload(LongtermPeriodIncomeTemplateLink.template),
+            joinedload(LongtermPeriod.expense_templates)
+            .joinedload(LongtermPeriodExpenseTemplateLink.template),
         )
         .filter(LongtermPeriod.plan_id == plan.id)
         .order_by(LongtermPeriod.start_month, LongtermPeriod.id)
         .all()
     )
-    return plan
+    return _serialize_plan(plan)
