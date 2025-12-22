@@ -105,12 +105,12 @@ function addPeriodRow(defaults = {}) {
         <div class="form-group">
             <label>Income Templates</label>
             <select class="period-income" multiple size="4"></select>
-            <div class="helper-text">Mehrere Templates mit Strg/Cmd auswählen.</div>
+            <div class="helper-text">Choose multiple Templates with Strg/Cmd.</div>
         </div>
         <div class="form-group">
             <label>Expense Templates</label>
             <select class="period-expense" multiple size="4"></select>
-            <div class="helper-text">Mehrere Templates mit Strg/Cmd auswählen.</div>
+            <div class="helper-text">Choose multiple Templates with Strg/Cmd.</div>
         </div>
         <div class="form-group period-actions">
             <button type="button" class="btn-delete remove-period">Remove</button>
