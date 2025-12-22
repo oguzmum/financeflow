@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longterm Detail - FinanceFlow</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="section">
+        <div class="section-header">
+            <div class="title-group">
+                <div class="pill" onclick="window.history.back()" style="cursor:pointer; margin-bottom:8px;">⬅ Back to Overview</div>
+                <h2 id="planTitle">Longterm Plan</h2>
+                <p id="planDescription"></p>
+            </div>
+        </div>
+
+        <div class="form-row three">
+            <div class="form-group">
+                <label>Start Month</label>
+                <input type="month" id="startMonth">
+            </div>
+            <div class="form-group">
+                <label>End Month</label>
+                <input type="month" id="endMonth">
+            </div>
+            <div class="form-group">
+                <label>Starting Balance (€)</label>
+                <input type="number" id="startingBalance" value="0" step="0.01">
+            </div>
+        </div>
+
+        <div class="form-row three">
+            <div class="form-group">
+                <label>Income Template</label>
+                <select id="incomeTemplate"></select>
+            </div>
+            <div class="form-group">
+                <label>Expense Template</label>
+                <select id="expenseTemplate"></select>
+            </div>
+            <div class="form-group" style="align-self:flex-end;">
+                <button onclick="generateProjection()" class="btn-calculate">Create Table</button>
+            </div>
+        </div>
+
+        <div id="projectionMessage" class="message"></div>
+
+        <div class="table-card" id="projectionTable"></div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/longterm-detail.js"></script>
+</body>
+</html>

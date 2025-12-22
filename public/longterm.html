@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longterm Plans - FinanceFlow</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="section">
+        <div class="section-header">
+            <div class="title-group">
+                <h2>🧭 Longterm Planing</h2>
+            </div>
+            <button class="primary-action" onclick="openPlanModal()">
+                ➕ New Plan
+            </button>
+        </div>
+
+        <div id="planList" class="card-grid"></div>
+    </div>
+
+    <div class="modal" id="planModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create new plan</h3>
+                <button class="close-btn" onclick="closePlanModal()">✖</button>
+            </div>
+            <div class="form-group">
+                <label>Plan Name</label>
+                <input type="text" id="planName">
+            </div>
+            <div class="form-group">
+                <label>Description (optional)</label>
+                <textarea id="planDescription" rows="3" placeholder="This is for..."></textarea>
+            </div>
+            <div class="btn-actions" style="justify-content: flex-end;">
+                <button onclick="closePlanModal()" class="close-btn">Cancel</button>
+                <button onclick="createPlan()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/longterm.js"></script>
+</body>
+</html>
