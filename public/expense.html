@@ -42,6 +42,24 @@
         <div class="entries-list" id="list"></div>
     </div>
 
+    <div class="section">
+        <h2>🧩 Expense Templates</h2>
+        <p>Create reusable templates by selecting the expenses that belong together. You can reuse them later for budgeting.</p>
+
+        <div id="templateMessage" class="message"></div>
+
+        <div class="form-group">
+            <label>Template Name</label>
+            <input type="text" id="templateName" placeholder="e.g. Household Bills, Car Costs, Groceries">
+        </div>
+
+        <div class="template-income-picker" id="templateExpensePicker"></div>
+
+        <button onclick="createTemplate()">Save Template</button>
+
+        <div class="entries-list" id="templateList"></div>
+    </div>
+
     <script src="js/common.js"></script>
     <script src="js/expense.js"></script>
 </body>

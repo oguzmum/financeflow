@@ -4,6 +4,9 @@ function loadPage(page, element) {
     });
     element.classList.add('active');
 
+	// cache-busting for iframe content to always load the latest HTML
+    const url =location.hostname === "localhost" ? `${page}?t=${Date.now()}` : page;
+
     document.getElementById('pageContent').src = page;
 }
 
@@ -48,4 +51,8 @@ function getExpenses() {
 
 function getIncomeTemplates() {
     return JSON.parse(localStorage.getItem('incomeTemplates')) || [];
+}
+
+function getExpenseTemplates() {
+    return JSON.parse(localStorage.getItem('expenseTemplates')) || [];
 }

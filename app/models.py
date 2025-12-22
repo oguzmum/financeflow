@@ -32,6 +32,12 @@ class Expense(Base):
     description = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
+    template_links = relationship(
+        "TemplateExpenseLink",
+        back_populates="expense",
+        cascade="all, delete-orphan",
+    )
+
 
 class IncomeTemplate(Base):
     __tablename__ = "income_templates"
@@ -69,3 +75,41 @@ class TemplateIncomeLink(Base):
 
     template = relationship("IncomeTemplate", back_populates="incomes")
     income = relationship("Income", back_populates="template_links")
+
+
+class ExpenseTemplate(Base):
+    __tablename__ = "expense_templates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    expenses = relationship(
+        "TemplateExpenseLink",
+        back_populates="template",
+        cascade="all, delete-orphan",
+    )
+
+
+class TemplateExpenseLink(Base):
+    __tablename__ = "template_expense_links"
+    __table_args__ = (
+        UniqueConstraint("template_id", "expense_id", name="uq_template_expense"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    template_id = Column(
+        Integer,
+        ForeignKey("expense_templates.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    expense_id = Column(
+        Integer,
+        ForeignKey("expenses.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    template = relationship("ExpenseTemplate", back_populates="expenses")
+    expense = relationship("Expense", back_populates="template_links")
