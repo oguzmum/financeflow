@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine, Base
-# from app.routes import users
+
+from app import models  # noqa: F401 - ensure models are imported for metadata
+from app.database import Base, engine
+from app.routes import expenses, incomes, longterm, templates
+
+if engine is None:
+    raise RuntimeError("DATABASE_URL is not configured; cannot start API without a database")
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,4 +21,7 @@ app.add_middleware(
 )
 
 # Routes
-# app.include_router(filename-class.router)
+app.include_router(incomes.router)
+app.include_router(expenses.router)
+app.include_router(templates.router)
+app.include_router(longterm.router)

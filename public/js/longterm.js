@@ -1,8 +1,17 @@
 let longtermPlans = [];
 
-function initLongterm() {
-    longtermPlans = getLongtermPlans();
-    renderPlans();
+async function initLongterm() {
+    try {
+        await loadPlans();
+        renderPlans();
+    } catch (error) {
+        console.error(error);
+        alert(error.message || 'Could not load plans.');
+    }
+}
+
+async function loadPlans() {
+    longtermPlans = await apiRequest('/longterm/plans');
 }
 
 function renderPlans() {
@@ -24,7 +33,7 @@ function renderPlans() {
             <div class="pill">Plan</div>
             <h3>${plan.name}</h3>
             ${plan.description ? `<p>${plan.description}</p>` : '<p>No Description.</p>'}
-            <div class="plan-meta">Created on ${new Date(plan.createdAt).toLocaleDateString()}</div>
+            <div class="plan-meta">Created on ${new Date(plan.created_at).toLocaleDateString()}</div>
         </div>
     `).join('');
 }
@@ -43,7 +52,7 @@ function closePlanModal() {
     document.getElementById('planDescription').value = '';
 }
 
-function createPlan() {
+async function createPlan() {
     const name = document.getElementById('planName').value.trim();
     const description = document.getElementById('planDescription').value.trim();
 
@@ -52,17 +61,18 @@ function createPlan() {
         return;
     }
 
-    const plan = {
-        id: Date.now(),
-        name,
-        description,
-        createdAt: new Date().toISOString()
-    };
-
-    longtermPlans.push(plan);
-    saveLongtermPlans(longtermPlans);
-    closePlanModal();
-    renderPlans();
+    try {
+        await apiRequest('/longterm/plans', {
+            method: 'POST',
+            body: { name, description }
+        });
+        await loadPlans();
+        closePlanModal();
+        renderPlans();
+    } catch (error) {
+        console.error(error);
+        alert(error.message || 'Failed to create plan.');
+    }
 }
 
 initLongterm();

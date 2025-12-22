@@ -41,26 +41,41 @@ function formatCurrency(amount) {
     })}`;
 }
 
-function getIncome() {
-    return JSON.parse(localStorage.getItem('income')) || [];
-}
+const API_BASE = '/api';
 
-function getExpenses() {
-    return JSON.parse(localStorage.getItem('expenses')) || [];
-}
+async function apiRequest(path, { method = 'GET', body, headers = {} } = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
 
-function getIncomeTemplates() {
-    return JSON.parse(localStorage.getItem('incomeTemplates')) || [];
-}
+  // 204 = no content
+  if (response.status === 204) return null;
 
-function getExpenseTemplates() {
-    return JSON.parse(localStorage.getItem('expenseTemplates')) || [];
-}
+  const raw = await response.text(); // read ONCE
 
-function getLongtermPlans() {
-    return JSON.parse(localStorage.getItem('longtermPlans')) || [];
-}
+  if (!response.ok) {
+    let msg = raw;
+    try {
+      const parsed = raw ? JSON.parse(raw) : null;
+      msg = parsed?.detail || parsed?.message || raw || `Request failed (${response.status})`;
+    } catch (_) {
+      msg = raw || `Request failed (${response.status})`;
+    }
+    throw new Error(msg);
+  }
 
-function saveLongtermPlans(plans) {
-    localStorage.setItem('longtermPlans', JSON.stringify(plans));
+  // ok response but empty body
+  if (!raw) return null;
+
+  // parse json if possible
+  try {
+    return JSON.parse(raw);
+  } catch (_) {
+    return raw;
+  }
 }

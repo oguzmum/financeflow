@@ -1,23 +1,27 @@
 let income = [];
 let incomeTemplates = [];
 
-function initIncome() {
-    income = getIncome();
-    incomeTemplates = getIncomeTemplates();
-    renderIncomeList();
-    renderTemplateIncomePicker();
-    renderTemplateList();
+async function initIncome() {
+    try {
+        await Promise.all([loadIncome(), loadIncomeTemplates()]);
+        renderIncomeList();
+        renderTemplateIncomePicker();
+        renderTemplateList();
+    } catch (error) {
+        console.error(error);
+        showMessage('message', error.message || 'Could not load income data.', 'error');
+    }
 }
 
-function saveIncome() {
-    localStorage.setItem('income', JSON.stringify(income));
+async function loadIncome() {
+    income = await apiRequest('/incomes');
 }
 
-function saveIncomeTemplates() {
-    localStorage.setItem('incomeTemplates', JSON.stringify(incomeTemplates));
+async function loadIncomeTemplates() {
+    incomeTemplates = await apiRequest('/templates/income');
 }
 
-function addEntry() {
+async function addEntry() {
     const name = document.getElementById('name').value.trim();
     const amount = parseFloat(document.getElementById('amount').value);
     const description = document.getElementById('description').value.trim();
@@ -27,20 +31,21 @@ function addEntry() {
         return;
     }
 
-    const entry = {
-        id: Date.now(),
-        name,
-        amount,
-        description
-    };
+    try {
+        await apiRequest('/incomes', {
+            method: 'POST',
+            body: { name, amount, description }
+        });
 
-    income.push(entry);
-    saveIncome();
-
-    clearIncomeForm();
-    renderIncomeList();
-    renderTemplateIncomePicker();
-    showMessage('message', 'Income added successfully.', 'success');
+        await loadIncome();
+        clearIncomeForm();
+        renderIncomeList();
+        renderTemplateIncomePicker();
+        showMessage('message', 'Income added successfully.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('message', error.message || 'Failed to add income.', 'error');
+    }
 }
 
 function clearIncomeForm() {
@@ -49,13 +54,17 @@ function clearIncomeForm() {
     document.getElementById('description').value = '';
 }
 
-function deleteEntry(id) {
-    income = income.filter(e => e.id !== id);
-    saveIncome();
-    pruneTemplates();
-    renderIncomeList();
-    renderTemplateIncomePicker();
-    renderTemplateList();
+async function deleteEntry(id) {
+    try {
+        await apiRequest(`/incomes/${id}`, { method: 'DELETE' });
+        await Promise.all([loadIncome(), loadIncomeTemplates()]);
+        renderIncomeList();
+        renderTemplateIncomePicker();
+        renderTemplateList();
+    } catch (error) {
+        console.error(error);
+        showMessage('message', error.message || 'Failed to delete income.', 'error');
+    }
 }
 
 function renderIncomeList() {
@@ -116,7 +125,7 @@ function renderTemplateIncomePicker() {
     `;
 }
 
-function createTemplate() {
+async function createTemplate() {
     const name = document.getElementById('templateName').value.trim();
     const selected = Array.from(document.querySelectorAll('.template-income-option:checked'))
         .map(el => Number(el.value));
@@ -131,44 +140,33 @@ function createTemplate() {
         return;
     }
 
-    const template = {
-        id: Date.now(),
-        name,
-        incomeIds: selected,
-        createdAt: new Date().toISOString()
-    };
+    try {
+        await apiRequest('/templates/income', {
+            method: 'POST',
+            body: { name, income_ids: selected }
+        });
 
-    incomeTemplates.push(template);
-    saveIncomeTemplates();
+        document.getElementById('templateName').value = '';
+        document.querySelectorAll('.template-income-option').forEach(el => el.checked = false);
 
-    document.getElementById('templateName').value = '';
-    document.querySelectorAll('.template-income-option').forEach(el => el.checked = false);
-
-    renderTemplateList();
-    showMessage('templateMessage', 'Template saved successfully.', 'success');
+        await loadIncomeTemplates();
+        renderTemplateList();
+        showMessage('templateMessage', 'Template saved successfully.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('templateMessage', error.message || 'Failed to save template.', 'error');
+    }
 }
 
-function deleteTemplate(id) {
-    incomeTemplates = incomeTemplates.filter(t => t.id !== id);
-    saveIncomeTemplates();
-    renderTemplateList();
-    showMessage('templateMessage', 'Template removed.', 'success');
-}
-
-function pruneTemplates() {
-    const existingIds = new Set(income.map(e => e.id));
-    let changed = false;
-
-    incomeTemplates = incomeTemplates.map(template => {
-        const filteredIds = template.incomeIds.filter(id => existingIds.has(id));
-        if (filteredIds.length !== template.incomeIds.length) {
-            changed = true;
-        }
-        return { ...template, incomeIds: filteredIds };
-    }).filter(template => template.incomeIds.length);
-
-    if (changed) {
-        saveIncomeTemplates();
+async function deleteTemplate(id) {
+    try {
+        await apiRequest(`/templates/income/${id}`, { method: 'DELETE' });
+        await loadIncomeTemplates();
+        renderTemplateList();
+        showMessage('templateMessage', 'Template removed.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('templateMessage', error.message || 'Failed to delete template.', 'error');
     }
 }
 
@@ -187,7 +185,7 @@ function renderTemplateList() {
     }
 
     templateList.innerHTML = '<h3>Saved Templates:</h3>' + incomeTemplates.map(template => {
-        const entries = income.filter(item => template.incomeIds.includes(item.id));
+        const entries = template.incomes || [];
         const incomeSummary = entries.map(item => item.name).join(', ') || 'No incomes linked';
         return `
             <div class="entry-item">

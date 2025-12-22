@@ -1,6 +1,16 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Numeric, DateTime, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -113,3 +123,35 @@ class TemplateExpenseLink(Base):
 
     template = relationship("ExpenseTemplate", back_populates="expenses")
     expense = relationship("Expense", back_populates="template_links")
+
+
+class LongtermPlan(Base):
+    __tablename__ = "longterm_plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    periods = relationship(
+        "LongtermPeriod",
+        back_populates="plan",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
+
+class LongtermPeriod(Base):
+    __tablename__ = "longterm_periods"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan_id = Column(Integer, ForeignKey("longterm_plans.id", ondelete="CASCADE"), nullable=False)
+    start_month = Column(Date, nullable=False)
+    end_month = Column(Date, nullable=False)
+    income_template_id = Column(Integer, ForeignKey("income_templates.id"), nullable=True)
+    expense_template_id = Column(Integer, ForeignKey("expense_templates.id"), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    plan = relationship("LongtermPlan", back_populates="periods")
+    income_template = relationship("IncomeTemplate")
+    expense_template = relationship("ExpenseTemplate")

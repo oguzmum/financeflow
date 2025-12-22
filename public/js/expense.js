@@ -1,24 +1,27 @@
 let expenses = [];
 let expenseTemplates = [];
 
-function initExpenses() {
-    expenses = getExpenses();
-    expenseTemplates = getExpenseTemplates();
-    pruneExpenseTemplates();
-    renderExpenseList();
-    renderTemplateExpensePicker();
-    renderTemplateList();
+async function initExpenses() {
+    try {
+        await Promise.all([loadExpenses(), loadExpenseTemplates()]);
+        renderExpenseList();
+        renderTemplateExpensePicker();
+        renderTemplateList();
+    } catch (error) {
+        console.error(error);
+        showMessage('message', error.message || 'Could not load expenses.', 'error');
+    }
 }
 
-function saveExpenses() {
-    localStorage.setItem('expenses', JSON.stringify(expenses));
+async function loadExpenses() {
+    expenses = await apiRequest('/expenses');
 }
 
-function saveExpenseTemplates() {
-    localStorage.setItem('expenseTemplates', JSON.stringify(expenseTemplates));
+async function loadExpenseTemplates() {
+    expenseTemplates = await apiRequest('/templates/expense');
 }
 
-function addEntry() {
+async function addEntry() {
     const name = document.getElementById('name').value.trim();
     const amount = parseFloat(document.getElementById('amount').value);
     const category = document.getElementById('category').value;
@@ -29,21 +32,21 @@ function addEntry() {
         return;
     }
 
-    const entry = {
-        id: Date.now(),
-        name,
-        amount,
-        category,
-        description
-    };
+    try {
+        await apiRequest('/expenses', {
+            method: 'POST',
+            body: { name, amount, category, description }
+        });
 
-    expenses.push(entry);
-    saveExpenses();
-
-    clearExpenseForm();
-    renderExpenseList();
-    renderTemplateExpensePicker();
-    showMessage('message', 'Expense added successfully.', 'success');
+        await loadExpenses();
+        clearExpenseForm();
+        renderExpenseList();
+        renderTemplateExpensePicker();
+        showMessage('message', 'Expense added successfully.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('message', error.message || 'Failed to add expense.', 'error');
+    }
 }
 
 function clearExpenseForm() {
@@ -53,13 +56,17 @@ function clearExpenseForm() {
     document.getElementById('category').value = 'housing';
 }
 
-function deleteEntry(id) {
-    expenses = expenses.filter(e => e.id !== id);
-    saveExpenses();
-    pruneExpenseTemplates();
-    renderExpenseList();
-    renderTemplateExpensePicker();
-    renderTemplateList();
+async function deleteEntry(id) {
+    try {
+        await apiRequest(`/expenses/${id}`, { method: 'DELETE' });
+        await Promise.all([loadExpenses(), loadExpenseTemplates()]);
+        renderExpenseList();
+        renderTemplateExpensePicker();
+        renderTemplateList();
+    } catch (error) {
+        console.error(error);
+        showMessage('message', error.message || 'Failed to delete expense.', 'error');
+    }
 }
 
 function renderExpenseList() {
@@ -124,7 +131,7 @@ function renderTemplateExpensePicker() {
     `;
 }
 
-function createTemplate() {
+async function createTemplate() {
     const name = document.getElementById('templateName').value.trim();
     const selected = Array.from(document.querySelectorAll('.template-expense-option:checked'))
         .map(el => Number(el.value));
@@ -139,44 +146,33 @@ function createTemplate() {
         return;
     }
 
-    const template = {
-        id: Date.now(),
-        name,
-        expenseIds: selected,
-        createdAt: new Date().toISOString()
-    };
+    try {
+        await apiRequest('/templates/expense', {
+            method: 'POST',
+            body: { name, expense_ids: selected }
+        });
 
-    expenseTemplates.push(template);
-    saveExpenseTemplates();
+        document.getElementById('templateName').value = '';
+        document.querySelectorAll('.template-expense-option').forEach(el => el.checked = false);
 
-    document.getElementById('templateName').value = '';
-    document.querySelectorAll('.template-expense-option').forEach(el => el.checked = false);
-
-    renderTemplateList();
-    showMessage('templateMessage', 'Template saved successfully.', 'success');
+        await loadExpenseTemplates();
+        renderTemplateList();
+        showMessage('templateMessage', 'Template saved successfully.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('templateMessage', error.message || 'Failed to save template.', 'error');
+    }
 }
 
-function deleteTemplate(id) {
-    expenseTemplates = expenseTemplates.filter(t => t.id !== id);
-    saveExpenseTemplates();
-    renderTemplateList();
-    showMessage('templateMessage', 'Template removed.', 'success');
-}
-
-function pruneExpenseTemplates() {
-    const existingIds = new Set(expenses.map(e => e.id));
-    let changed = false;
-
-    expenseTemplates = expenseTemplates.map(template => {
-        const filteredIds = template.expenseIds.filter(id => existingIds.has(id));
-        if (filteredIds.length !== template.expenseIds.length) {
-            changed = true;
-        }
-        return { ...template, expenseIds: filteredIds };
-    }).filter(template => template.expenseIds.length);
-
-    if (changed) {
-        saveExpenseTemplates();
+async function deleteTemplate(id) {
+    try {
+        await apiRequest(`/templates/expense/${id}`, { method: 'DELETE' });
+        await loadExpenseTemplates();
+        renderTemplateList();
+        showMessage('templateMessage', 'Template removed.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('templateMessage', error.message || 'Failed to delete template.', 'error');
     }
 }
 
@@ -195,7 +191,7 @@ function renderTemplateList() {
     }
 
     templateList.innerHTML = '<h3>Saved Templates:</h3>' + expenseTemplates.map(template => {
-        const entries = expenses.filter(item => template.expenseIds.includes(item.id));
+        const entries = template.expenses || [];
         const expenseSummary = entries.map(item => item.name).join(', ') || 'No expenses linked';
         return `
             <div class="entry-item">

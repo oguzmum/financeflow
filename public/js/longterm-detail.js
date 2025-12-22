@@ -9,13 +9,11 @@ function buildTemplateOptions(templates) {
         templates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
 }
 
-function initDetail() {
+async function initDetail() {
     const params = new URLSearchParams(window.location.search);
     const id = Number(params.get('id'));
-    const plans = getLongtermPlans();
-    plan = plans.find(p => p.id === id);
 
-    if (!plan) {
+    if (!id) {
         document.querySelector('.section').innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">❓</div>
@@ -26,16 +24,50 @@ function initDetail() {
         return;
     }
 
-    document.getElementById('planTitle').textContent = plan.name;
-    const descEl = document.getElementById('planDescription');
-    descEl.textContent = plan.description || 'No Description.';
+    try {
+        const [planResponse, incomesResponse, expensesResponse, incomeTemplatesResponse, expenseTemplatesResponse] = await Promise.all([
+            apiRequest(`/longterm/plans/${id}`),
+            apiRequest('/incomes'),
+            apiRequest('/expenses'),
+            apiRequest('/templates/income'),
+            apiRequest('/templates/expense'),
+        ]);
 
-    incomeTemplates = getIncomeTemplates();
-    expenseTemplates = getExpenseTemplates();
-    incomeEntries = getIncome();
-    expenseEntries = getExpenses();
+        plan = planResponse;
+        incomeEntries = incomesResponse;
+        expenseEntries = expensesResponse;
+        incomeTemplates = incomeTemplatesResponse;
+        expenseTemplates = expenseTemplatesResponse;
 
-    addPeriodRow(getPresetRange());
+        document.getElementById('planTitle').textContent = plan.name;
+        const descEl = document.getElementById('planDescription');
+        descEl.textContent = plan.description || 'No Description.';
+
+        if (plan.periods && plan.periods.length) {
+            plan.periods.forEach(period => addPeriodRow({
+                start: toMonthInput(period.start_month),
+                end: toMonthInput(period.end_month),
+                incomeTemplateId: period.income_template_id || '',
+                expenseTemplateId: period.expense_template_id || ''
+            }));
+        } else {
+            addPeriodRow(getPresetRange());
+        }
+    } catch (error) {
+        console.error(error);
+        document.querySelector('.section').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">❓</div>
+                <p>${error.message || 'Plan could not be loaded.'}</p>
+                <button onclick="window.location.href='longterm.html'" style="margin-top:12px;">Zurück</button>
+            </div>
+        `;
+    }
+}
+
+function toMonthInput(dateString) {
+    if (!dateString) return '';
+    return dateString.slice(0, 7);
 }
 
 function getPresetRange() {
@@ -80,8 +112,8 @@ function addPeriodRow(defaults = {}) {
     incomeSelect.innerHTML = buildTemplateOptions(incomeTemplates);
     expenseSelect.innerHTML = buildTemplateOptions(expenseTemplates);
 
-    if (defaults.incomeTemplateId) incomeSelect.value = defaults.incomeTemplateId;
-    if (defaults.expenseTemplateId) expenseSelect.value = defaults.expenseTemplateId;
+    if (defaults.incomeTemplateId !== undefined) incomeSelect.value = defaults.incomeTemplateId;
+    if (defaults.expenseTemplateId !== undefined) expenseSelect.value = defaults.expenseTemplateId;
 
     row.querySelector('.remove-period').addEventListener('click', () => {
         row.remove();
@@ -107,11 +139,11 @@ function monthRange(start, end) {
     return months;
 }
 
-function templateSum(templateId, entries, templates, key) {
+function templateSum(templateId, entries, templates, entryKey) {
     if (!templateId) return 0;
     const template = templates.find(t => t.id === Number(templateId));
     if (!template) return 0;
-    const ids = new Set(template[key]);
+    const ids = new Set((template[entryKey] || []).map(item => item.id));
     return entries
         .filter(e => ids.has(e.id))
         .reduce((sum, e) => sum + Number(e.amount || 0), 0);
@@ -137,6 +169,40 @@ function collectPeriods() {
     }));
 }
 
+async function savePeriods() {
+    const periods = collectPeriods();
+    if (!periods.length) {
+        showMessage('projectionMessage', 'Füge mindestens einen Zeitraum hinzu.', 'error');
+        return;
+    }
+
+    const payload = [];
+    for (let i = 0; i < periods.length; i++) {
+        const period = periods[i];
+        if (!period.start || !period.end) {
+            showMessage('projectionMessage', `Zeitraum ${i + 1}: Bitte Start- und Endmonat wählen.`, 'error');
+            return;
+        }
+        payload.push({
+            start_month: period.start,
+            end_month: period.end,
+            income_template_id: period.incomeTemplateId ? Number(period.incomeTemplateId) : null,
+            expense_template_id: period.expenseTemplateId ? Number(period.expenseTemplateId) : null
+        });
+    }
+
+    try {
+        plan = await apiRequest(`/longterm/plans/${plan.id}/periods`, {
+            method: 'PUT',
+            body: payload
+        });
+        showMessage('projectionMessage', 'Zeiträume gespeichert.', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('projectionMessage', error.message || 'Konnte Zeiträume nicht speichern.', 'error');
+    }
+}
+
 function generateProjection() {
     const startingBalance = Number(document.getElementById('startingBalance').value || 0);
 
@@ -160,8 +226,8 @@ function generateProjection() {
             return;
         }
 
-        const monthlyIncome = templateSum(period.incomeTemplateId, incomeEntries, incomeTemplates, 'incomeIds');
-        const monthlyExpense = templateSum(period.expenseTemplateId, expenseEntries, expenseTemplates, 'expenseIds');
+        const monthlyIncome = templateSum(period.incomeTemplateId, incomeEntries, incomeTemplates, 'incomes');
+        const monthlyExpense = templateSum(period.expenseTemplateId, expenseEntries, expenseTemplates, 'expenses');
 
         months.forEach(date => {
             const key = monthKey(date);
