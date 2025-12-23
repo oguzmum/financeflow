@@ -52,6 +52,7 @@ async function initDetail() {
         document.getElementById('planTitle').textContent = plan.name;
         const descEl = document.getElementById('planDescription');
         descEl.textContent = plan.description || 'No Description.';
+        document.getElementById('startingBalance').value = Number(plan.starting_balance || 0);
 
         if (plan.periods && plan.periods.length) {
             plan.periods.forEach(period => addPeriodRow({
@@ -228,6 +229,12 @@ function collectPeriods() {
 }
 
 async function savePeriods() {
+    const startingBalance = Number(document.getElementById('startingBalance').value || 0);
+    if (Number.isNaN(startingBalance)) {
+        showMessage('projectionMessage', 'Bitte eine gültige Start-Balance eingeben.', 'error');
+        return;
+    }
+
     const periods = collectPeriods();
     if (!periods.length) {
         showMessage('projectionMessage', 'Füge mindestens einen Zeitraum hinzu.', 'error');
@@ -252,8 +259,12 @@ async function savePeriods() {
     try {
         plan = await apiRequest(`/longterm/plans/${plan.id}/periods`, {
             method: 'PUT',
-            body: payload
+            body: {
+                starting_balance: startingBalance,
+                periods: payload
+            }
         });
+        document.getElementById('startingBalance').value = Number(plan.starting_balance || 0);
         showMessage('projectionMessage', 'Zeiträume gespeichert.', 'success');
     } catch (error) {
         console.error(error);

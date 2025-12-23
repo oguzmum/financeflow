@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -58,6 +59,7 @@ class LongtermPeriodPayload(BaseModel):
 class LongtermPlanCreate(BaseModel):
     name: str = Field(..., max_length=255)
     description: Optional[str] = None
+    starting_balance: Decimal = Field(default=0)
 
 
 class LongtermPlanRead(BaseModel):
@@ -66,6 +68,7 @@ class LongtermPlanRead(BaseModel):
     id: int
     name: str
     description: Optional[str]
+    starting_balance: Decimal
     created_at: datetime
 
 
@@ -90,6 +93,11 @@ class LongtermPeriodRead(BaseModel):
 
 class LongtermPlanDetail(LongtermPlanRead):
     periods: List[LongtermPeriodRead]
+
+
+class LongtermPeriodReplacePayload(BaseModel):
+    starting_balance: Decimal = Field(default=0)
+    periods: List[LongtermPeriodPayload] = Field(default_factory=list)
 
 
 router = APIRouter(prefix="/api/longterm", tags=["longterm"])
@@ -121,6 +129,7 @@ def _serialize_plan(plan: LongtermPlan) -> dict:
         "id": plan.id,
         "name": plan.name,
         "description": plan.description,
+        "starting_balance": float(plan.starting_balance or 0),
         "created_at": plan.created_at,
         "periods": [_serialize_period(p) for p in periods],
     }
@@ -133,7 +142,11 @@ def list_plans(db: Session = Depends(get_db)) -> List[LongtermPlan]:
 
 @router.post("/plans", response_model=LongtermPlanRead, status_code=status.HTTP_201_CREATED)
 def create_plan(payload: LongtermPlanCreate, db: Session = Depends(get_db)) -> LongtermPlan:
-    plan = LongtermPlan(name=payload.name, description=payload.description)
+    plan = LongtermPlan(
+        name=payload.name,
+        description=payload.description,
+        starting_balance=payload.starting_balance,
+    )
     db.add(plan)
     db.commit()
     db.refresh(plan)
@@ -172,7 +185,7 @@ def delete_plan(plan_id: int, db: Session = Depends(get_db)) -> None:
 @router.put("/plans/{plan_id}/periods", response_model=LongtermPlanDetail)
 def replace_periods(
     plan_id: int,
-    payload: List[LongtermPeriodPayload],
+    payload: LongtermPeriodReplacePayload,
     db: Session = Depends(get_db),
 ) -> dict:
     plan = (
@@ -184,8 +197,14 @@ def replace_periods(
     if plan is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plan not found")
 
-    income_template_ids = {template_id for item in payload for template_id in item.income_template_ids}
-    expense_template_ids = {template_id for item in payload for template_id in item.expense_template_ids}
+    if not payload.periods:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="At least one period is required.",
+        )
+
+    income_template_ids = {template_id for item in payload.periods for template_id in item.income_template_ids}
+    expense_template_ids = {template_id for item in payload.periods for template_id in item.expense_template_ids}
 
     if income_template_ids:
         found_income_templates = {t.id for t in db.query(IncomeTemplate).filter(IncomeTemplate.id.in_(income_template_ids))}
@@ -205,8 +224,9 @@ def replace_periods(
                 detail=f"Expense templates not found: {sorted(missing_expenses)}",
             )
 
+    plan.starting_balance = payload.starting_balance
     plan.periods.clear()
-    for period_payload in payload:
+    for period_payload in payload.periods:
         try:
             start_month = _month_to_date(period_payload.start_month)
             end_month = _month_to_date(period_payload.end_month)
