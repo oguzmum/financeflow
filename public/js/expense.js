@@ -234,10 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initExpenses();
 });
 
-
-// Initialize on load
-// initExpenses();
-
 function setupAnnualPaymentToggle() {
     const checkbox = document.getElementById('isAnnualPayment');
     if (!checkbox) return;
