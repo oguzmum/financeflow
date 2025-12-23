@@ -25,6 +25,18 @@ def _month_to_date(month_value: str) -> date:
         raise ValueError("Invalid month format. Expected YYYY-MM.") from exc
 
 
+def _decimal_to_float(value: Optional[Decimal]) -> float:
+    if value is None:
+        return 0.0
+    return float(value)
+
+
+def _parse_optional_month(value: Optional[str]) -> Optional[date]:
+    if not value:
+        return None
+    return _month_to_date(value)
+
+
 class LongtermPeriodPayload(BaseModel):
     start_month: str = Field(..., pattern=r"^\d{4}-\d{2}$")
     end_month: str = Field(..., pattern=r"^\d{4}-\d{2}$")
@@ -60,6 +72,17 @@ class LongtermPlanCreate(BaseModel):
     name: str = Field(..., max_length=255)
     description: Optional[str] = None
     starting_balance: Decimal = Field(default=0)
+    financing_start_month: Optional[str] = Field(default=None, pattern=r"^\d{4}-\d{2}$")
+    car_purchase_price: Decimal = Field(default=0)
+    car_down_payment: Decimal = Field(default=0)
+    car_final_payment: Decimal = Field(default=0)
+    car_monthly_rate: Decimal = Field(default=0)
+    car_term_months: int = Field(default=0, ge=0)
+    car_insurance_monthly: Decimal = Field(default=0)
+    car_fuel_monthly: Decimal = Field(default=0)
+    car_maintenance_monthly: Decimal = Field(default=0)
+    car_tax_monthly: Decimal = Field(default=0)
+    car_interest_rate: Decimal = Field(default=0, ge=0)
 
 
 class LongtermPlanRead(BaseModel):
@@ -69,7 +92,18 @@ class LongtermPlanRead(BaseModel):
     name: str
     description: Optional[str]
     starting_balance: Decimal
+    financing_start_month: Optional[date]
+    car_purchase_price: Decimal
+    car_down_payment: Decimal
+    car_final_payment: Decimal
+    car_monthly_rate: Decimal
+    car_term_months: int
+    car_insurance_monthly: Decimal
+    car_fuel_monthly: Decimal
+    car_maintenance_monthly: Decimal
+    car_tax_monthly: Decimal
     created_at: datetime
+    car_interest_rate: Decimal
 
 
 class TemplateSummary(BaseModel):
@@ -97,7 +131,18 @@ class LongtermPlanDetail(LongtermPlanRead):
 
 class LongtermPeriodReplacePayload(BaseModel):
     starting_balance: Decimal = Field(default=0)
+    financing_start_month: Optional[str] = Field(default=None, pattern=r"^\d{4}-\d{2}$")
+    car_purchase_price: Decimal = Field(default=0)
+    car_down_payment: Decimal = Field(default=0)
+    car_final_payment: Decimal = Field(default=0)
+    car_monthly_rate: Decimal = Field(default=0)
+    car_term_months: int = Field(default=0, ge=0)
+    car_insurance_monthly: Decimal = Field(default=0)
+    car_fuel_monthly: Decimal = Field(default=0)
+    car_maintenance_monthly: Decimal = Field(default=0)
+    car_tax_monthly: Decimal = Field(default=0)
     periods: List[LongtermPeriodPayload] = Field(default_factory=list)
+    car_interest_rate: Decimal = Field(default=0, ge=0)
 
 
 router = APIRouter(prefix="/api/longterm", tags=["longterm"])
@@ -129,7 +174,18 @@ def _serialize_plan(plan: LongtermPlan) -> dict:
         "id": plan.id,
         "name": plan.name,
         "description": plan.description,
-        "starting_balance": float(plan.starting_balance or 0),
+        "starting_balance": _decimal_to_float(plan.starting_balance),
+        "financing_start_month": plan.financing_start_month,
+        "car_purchase_price": _decimal_to_float(plan.car_purchase_price),
+        "car_down_payment": _decimal_to_float(plan.car_down_payment),
+        "car_final_payment": _decimal_to_float(plan.car_final_payment),
+        "car_monthly_rate": _decimal_to_float(plan.car_monthly_rate),
+        "car_term_months": plan.car_term_months or 0,
+        "car_insurance_monthly": _decimal_to_float(plan.car_insurance_monthly),
+		"car_fuel_monthly": _decimal_to_float(plan.car_fuel_monthly),
+		"car_maintenance_monthly": _decimal_to_float(plan.car_maintenance_monthly),
+		"car_tax_monthly": _decimal_to_float(plan.car_tax_monthly),
+  		"car_interest_rate": _decimal_to_float(plan.car_interest_rate),
         "created_at": plan.created_at,
         "periods": [_serialize_period(p) for p in periods],
     }
@@ -142,10 +198,26 @@ def list_plans(db: Session = Depends(get_db)) -> List[LongtermPlan]:
 
 @router.post("/plans", response_model=LongtermPlanRead, status_code=status.HTTP_201_CREATED)
 def create_plan(payload: LongtermPlanCreate, db: Session = Depends(get_db)) -> LongtermPlan:
+    try:
+        financing_start_month = _parse_optional_month(payload.financing_start_month)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
     plan = LongtermPlan(
         name=payload.name,
         description=payload.description,
         starting_balance=payload.starting_balance,
+        financing_start_month=financing_start_month,
+        car_purchase_price=payload.car_purchase_price,
+        car_down_payment=payload.car_down_payment,
+        car_final_payment=payload.car_final_payment,
+        car_monthly_rate=payload.car_monthly_rate,
+        car_term_months=payload.car_term_months,
+        car_insurance_monthly=payload.car_insurance_monthly,
+		car_fuel_monthly=payload.car_fuel_monthly,
+		car_maintenance_monthly=payload.car_maintenance_monthly,
+		car_tax_monthly=payload.car_tax_monthly,
+  		car_interest_rate=payload.car_interest_rate,
     )
     db.add(plan)
     db.commit()
@@ -225,6 +297,20 @@ def replace_periods(
             )
 
     plan.starting_balance = payload.starting_balance
+    try:
+        plan.financing_start_month = _parse_optional_month(payload.financing_start_month)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    plan.car_purchase_price = payload.car_purchase_price
+    plan.car_down_payment = payload.car_down_payment
+    plan.car_final_payment = payload.car_final_payment
+    plan.car_monthly_rate = payload.car_monthly_rate
+    plan.car_term_months = payload.car_term_months
+    plan.car_insurance_monthly = payload.car_insurance_monthly
+    plan.car_fuel_monthly = payload.car_fuel_monthly
+    plan.car_maintenance_monthly = payload.car_maintenance_monthly
+    plan.car_tax_monthly = payload.car_tax_monthly
+    plan.car_interest_rate = payload.car_interest_rate
     plan.periods.clear()
     for period_payload in payload.periods:
         try:

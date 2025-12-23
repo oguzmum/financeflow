@@ -21,6 +21,83 @@
             <input type="number" id="startingBalance" value="0" step="0.01">
         </div>
 
+        <div class="card" style="margin-bottom:16px;">
+            <h3 style="margin-bottom:12px;">Vehicle Financing</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Financing starts (month)</label>
+                    <input type="month" id="financingStartMonth">
+                </div>
+				<div class="form-group">
+					<label>Interest rate (% p.a.)</label>
+					<input
+						type="number"
+						id="interestRate"
+						step="0.01"
+						min="0"
+						placeholder="3.49"
+					>
+				</div>
+                <div class="form-group">
+                    <label>Purchase price (€)</label>
+                    <input type="number" id="purchasePrice" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Down payment (€)</label>
+                    <input type="number" id="downPayment" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Final payment / balloon (€)</label>
+                    <input type="number" id="finalPayment" step="0.01" placeholder="0.00">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Term (months)</label>
+                    <input type="number" id="termMonths" min="0" step="1" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Monthly financing rate (€)</label>
+                    <input type="number" id="monthlyRate" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group" style="flex:2;">
+                    <label>Financing summary</label>
+                    <div id="financingSummary" class="helper-text">Enter financing details to see the total interest.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+			<h3 style="margin-bottom:12px;">Vehicle running costs (monthly)</h3>
+
+			<div class="form-row">
+				<div class="form-group">
+				<label>Insurance (€ / month)</label>
+				<input type="number" id="carInsuranceMonthly" step="0.01" placeholder="0.00">
+				</div>
+
+				<div class="form-group">
+				<label>Fuel (€ / month)</label>
+				<input type="number" id="carFuelMonthly" step="0.01" placeholder="0.00">
+				</div>
+
+				<div class="form-group">
+				<label>Maintenance (€ / month)</label>
+				<input type="number" id="carMaintenanceMonthly" step="0.01" placeholder="0.00">
+				</div>
+
+				<div class="form-group">
+				<label>Tax (€ / month)</label>
+				<input type="number" id="carTaxMonthly" step="0.01" placeholder="0.00">
+				</div>
+			</div>
+
+			<div class="helper-text">
+				These values are added every month during the financing term (together with the monthly financing rate).
+			</div>
+		</div>
+
+
         <div class="form-group">
             <div class="periods-header">
                 <label>Periods & Templates</label>

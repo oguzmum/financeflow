@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 7e8d8241b7e2
+Revision ID: d6fa33353a31
 Revises: 
-Create Date: 2025-12-23 11:08:02.403787
+Create Date: 2025-12-23 17:08:05.563897
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7e8d8241b7e2'
+revision = 'd6fa33353a31'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -60,6 +60,17 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('starting_balance', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('financing_start_month', sa.Date(), nullable=True),
+    sa.Column('car_purchase_price', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_down_payment', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_final_payment', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_monthly_rate', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_term_months', sa.Integer(), nullable=False),
+    sa.Column('car_insurance_monthly', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_fuel_monthly', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_maintenance_monthly', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_tax_monthly', sa.Numeric(precision=12, scale=2), nullable=False),
+    sa.Column('car_interest_rate', sa.Numeric(precision=5, scale=2), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )

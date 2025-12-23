@@ -135,6 +135,17 @@ class LongtermPlan(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     starting_balance = Column(Numeric(12, 2), nullable=False, default=0)
+    financing_start_month = Column(Date, nullable=True)
+    car_purchase_price = Column(Numeric(12, 2), nullable=False, default=0)
+    car_down_payment = Column(Numeric(12, 2), nullable=False, default=0)
+    car_final_payment = Column(Numeric(12, 2), nullable=False, default=0)
+    car_monthly_rate = Column(Numeric(12, 2), nullable=False, default=0)
+    car_term_months = Column(Integer, nullable=False, default=0)
+    car_insurance_monthly = Column(Numeric(12, 2), nullable=False, default=0)
+    car_fuel_monthly = Column(Numeric(12, 2), nullable=False, default=0)
+    car_maintenance_monthly = Column(Numeric(12, 2), nullable=False, default=0)
+    car_tax_monthly = Column(Numeric(12, 2), nullable=False, default=0)
+    car_interest_rate = Column(Numeric(5, 2), nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
     periods = relationship(

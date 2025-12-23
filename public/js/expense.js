@@ -1,9 +1,6 @@
 let expenses = [];
 let expenseTemplates = [];
 
-console.log("expense.js loaded ✅", window.location.href);
-
-
 async function initExpenses() {
     try {
         setupAnnualPaymentToggle();
