@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings - FinanceFlow</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="section">
+        <h2>💾 Savings</h2>
+        <div id="message" class="message"></div>
+
+        <div class="form-group">
+            <label>Saving name</label>
+            <input type="text" id="name" placeholder="e.g. ETF, savings account">
+        </div>
+
+        <div class="form-group">
+            <label>Amount (€ / month)</label>
+            <input type="number" id="amount" step="0.01" placeholder="e.g. 250">
+        </div>
+
+        <div class="form-group">
+            <label>Description (optional)</label>
+            <textarea id="description" rows="2" placeholder="Notes about this saving..."></textarea>
+        </div>
+
+        <button onclick="addSaving()">Add saving</button>
+
+        <div class="entries-list" id="list"></div>
+    </div>
+
+    <div class="section">
+        <h2>🧩 Saving Templates</h2>
+        <p>Combine multiple savings into a template and select them later in the long-term planning.</p>
+
+        <div id="templateMessage" class="message"></div>
+
+        <div class="form-group">
+            <label>Template name</label>
+            <input type="text" id="templateName" placeholder="e.g. ETF portfolio">
+        </div>
+
+        <div class="template-income-picker" id="templateSavingPicker"></div>
+
+        <button onclick="createTemplate()">Save template</button>
+
+        <div class="entries-list" id="templateList"></div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script src="js/saving.js"></script>
+</body>
+</html>

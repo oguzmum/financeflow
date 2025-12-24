@@ -13,9 +13,13 @@ from app.models import (
     IncomeTemplate,
     TemplateExpenseLink,
     TemplateIncomeLink,
+    TemplateSavingLink,
+    Saving,
+    SavingTemplate,
 )
 from app.routes.expenses import ExpenseRead
 from app.routes.incomes import IncomeRead
+from app.routes.savings import SavingRead
 
 
 class TemplateBase(BaseModel):
@@ -29,6 +33,10 @@ class IncomeTemplateCreate(TemplateBase):
 
 class ExpenseTemplateCreate(TemplateBase):
     expense_ids: List[int] = Field(..., min_length=1)
+
+
+class SavingTemplateCreate(TemplateBase):
+    saving_ids: List[int] = Field(..., min_length=1)
 
 
 class IncomeTemplateRead(BaseModel):
@@ -49,6 +57,16 @@ class ExpenseTemplateRead(BaseModel):
     description: Optional[str]
     created_at: datetime
     expenses: List[ExpenseRead]
+
+
+class SavingTemplateRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: Optional[str]
+    created_at: datetime
+    savings: List["SavingRead"]
 
 
 router = APIRouter(prefix="/api/templates", tags=["templates"])
@@ -146,6 +164,64 @@ def create_expense_template(payload: ExpenseTemplateCreate, db: Session = Depend
 @router.delete("/expense/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_expense_template(template_id: int, db: Session = Depends(get_db)) -> None:
     template = db.get(ExpenseTemplate, template_id)
+    if template is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+    db.delete(template)
+    db.commit()
+
+
+@router.get("/saving", response_model=List[SavingTemplateRead])
+def list_saving_templates(db: Session = Depends(get_db)) -> List[dict]:
+    templates = (
+        db.query(SavingTemplate)
+        .options(joinedload(SavingTemplate.savings).joinedload(TemplateSavingLink.saving))
+        .order_by(SavingTemplate.created_at.desc())
+        .all()
+    )
+
+    return [
+        {
+            "id": t.id,
+            "name": t.name,
+            "description": t.description,
+            "created_at": t.created_at,
+            "savings": [link.saving for link in t.savings],
+        }
+        for t in templates
+    ]
+
+
+@router.post("/saving", response_model=SavingTemplateRead, status_code=status.HTTP_201_CREATED)
+def create_saving_template(payload: SavingTemplateCreate, db: Session = Depends(get_db)) -> dict:
+    savings = db.query(Saving).filter(Saving.id.in_(payload.saving_ids)).all()
+    if len(savings) != len(set(payload.saving_ids)):
+        raise HTTPException(status_code=404, detail="One or more saving IDs were not found")
+
+    template = SavingTemplate(name=payload.name, description=payload.description)
+    template.savings = [TemplateSavingLink(saving=saving) for saving in savings]
+
+    db.add(template)
+    db.commit()
+
+    template = (
+        db.query(SavingTemplate)
+        .options(joinedload(SavingTemplate.savings).joinedload(TemplateSavingLink.saving))
+        .filter(SavingTemplate.id == template.id)
+        .one()
+    )
+
+    return {
+        "id": template.id,
+        "name": template.name,
+        "description": template.description,
+        "created_at": template.created_at,
+        "savings": [link.saving for link in (template.savings or [])],
+    }
+
+
+@router.delete("/saving/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_saving_template(template_id: int, db: Session = Depends(get_db)) -> None:
+    template = db.get(SavingTemplate, template_id)
     if template is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
     db.delete(template)

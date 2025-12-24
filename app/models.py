@@ -146,6 +146,7 @@ class LongtermPlan(Base):
     car_maintenance_monthly = Column(Numeric(12, 2), nullable=False, default=0)
     car_tax_monthly = Column(Numeric(12, 2), nullable=False, default=0)
     car_interest_rate = Column(Numeric(5, 2), nullable=False, default=0)
+    savings_return_rate = Column(Numeric(5, 2), nullable=False, default=7)
     created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
 
     periods = relationship(
@@ -173,6 +174,11 @@ class LongtermPeriod(Base):
     )
     expense_templates = relationship(
         "LongtermPeriodExpenseTemplateLink",
+        back_populates="period",
+        cascade="all, delete-orphan",
+    )
+    savings_templates = relationship(
+        "LongtermPeriodSavingTemplateLink",
         back_populates="period",
         cascade="all, delete-orphan",
     )
@@ -222,3 +228,80 @@ class LongtermPeriodExpenseTemplateLink(Base):
 
     period = relationship("LongtermPeriod", back_populates="expense_templates")
     template = relationship("ExpenseTemplate")
+
+
+class Saving(Base):
+    __tablename__ = "savings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    amount = Column(Numeric(12, 2), nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    template_links = relationship(
+        "TemplateSavingLink",
+        back_populates="saving",
+        cascade="all, delete-orphan",
+    )
+
+
+class SavingTemplate(Base):
+    __tablename__ = "saving_templates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    savings = relationship(
+        "TemplateSavingLink",
+        back_populates="template",
+        cascade="all, delete-orphan",
+    )
+
+
+class TemplateSavingLink(Base):
+    __tablename__ = "template_saving_links"
+    __table_args__ = (
+        UniqueConstraint("template_id", "saving_id", name="uq_template_saving"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    template_id = Column(
+        Integer,
+        ForeignKey("saving_templates.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    saving_id = Column(
+        Integer,
+        ForeignKey("savings.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    template = relationship("SavingTemplate", back_populates="savings")
+    saving = relationship("Saving", back_populates="template_links")
+
+
+class LongtermPeriodSavingTemplateLink(Base):
+    __tablename__ = "longterm_period_saving_template_links"
+    __table_args__ = (
+        UniqueConstraint("period_id", "template_id", name="uq_longterm_period_saving_template"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    period_id = Column(
+        Integer,
+        ForeignKey("longterm_periods.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    template_id = Column(
+        Integer,
+        ForeignKey("saving_templates.id"),
+        nullable=False,
+    )
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+
+    period = relationship("LongtermPeriod", back_populates="savings_templates")
+    template = relationship("SavingTemplate")

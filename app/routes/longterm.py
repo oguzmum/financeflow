@@ -13,7 +13,9 @@ from app.models import (
     LongtermPeriod,
     LongtermPeriodExpenseTemplateLink,
     LongtermPeriodIncomeTemplateLink,
+    LongtermPeriodSavingTemplateLink,
     LongtermPlan,
+    SavingTemplate,
 )
 
 
@@ -42,8 +44,9 @@ class LongtermPeriodPayload(BaseModel):
     end_month: str = Field(..., pattern=r"^\d{4}-\d{2}$")
     income_template_ids: List[int] = Field(default_factory=list)
     expense_template_ids: List[int] = Field(default_factory=list)
+    saving_template_ids: List[int] = Field(default_factory=list)
 
-    @field_validator("income_template_ids", "expense_template_ids")
+    @field_validator("income_template_ids", "expense_template_ids", "saving_template_ids")
     @classmethod
     def ensure_unique(cls, values: List[int]) -> List[int]:
         seen = set()
@@ -83,6 +86,7 @@ class LongtermPlanCreate(BaseModel):
     car_maintenance_monthly: Decimal = Field(default=0)
     car_tax_monthly: Decimal = Field(default=0)
     car_interest_rate: Decimal = Field(default=0, ge=0)
+    savings_return_rate: Decimal = Field(default=7, ge=0)
 
 
 class LongtermPlanRead(BaseModel):
@@ -104,6 +108,7 @@ class LongtermPlanRead(BaseModel):
     car_tax_monthly: Decimal
     created_at: datetime
     car_interest_rate: Decimal
+    savings_return_rate: Decimal
 
 
 class TemplateSummary(BaseModel):
@@ -121,6 +126,7 @@ class LongtermPeriodRead(BaseModel):
     end_month: date
     income_template_ids: List[int] = Field(default_factory=list)
     expense_template_ids: List[int] = Field(default_factory=list)
+    saving_template_ids: List[int] = Field(default_factory=list)
     income_templates: List[TemplateSummary] = Field(default_factory=list)
     expense_templates: List[TemplateSummary] = Field(default_factory=list)
 
@@ -143,6 +149,7 @@ class LongtermPeriodReplacePayload(BaseModel):
     car_tax_monthly: Decimal = Field(default=0)
     periods: List[LongtermPeriodPayload] = Field(default_factory=list)
     car_interest_rate: Decimal = Field(default=0, ge=0)
+    savings_return_rate: Decimal = Field(default=7, ge=0)
 
 
 router = APIRouter(prefix="/api/longterm", tags=["longterm"])
@@ -155,6 +162,7 @@ def _serialize_period(period: LongtermPeriod) -> dict:
         "end_month": period.end_month,
         "income_template_ids": [link.template_id for link in (period.income_templates or [])],
         "expense_template_ids": [link.template_id for link in (period.expense_templates or [])],
+        "saving_template_ids": [link.template_id for link in (period.savings_templates or [])],
         "income_templates": [
             {"id": link.template.id, "name": link.template.name}
             for link in (period.income_templates or [])
@@ -163,6 +171,11 @@ def _serialize_period(period: LongtermPeriod) -> dict:
         "expense_templates": [
             {"id": link.template.id, "name": link.template.name}
             for link in (period.expense_templates or [])
+            if link.template
+        ],
+        "saving_templates": [
+            {"id": link.template.id, "name": link.template.name}
+            for link in (period.savings_templates or [])
             if link.template
         ],
     }
@@ -183,9 +196,10 @@ def _serialize_plan(plan: LongtermPlan) -> dict:
         "car_term_months": plan.car_term_months or 0,
         "car_insurance_monthly": _decimal_to_float(plan.car_insurance_monthly),
 		"car_fuel_monthly": _decimal_to_float(plan.car_fuel_monthly),
-		"car_maintenance_monthly": _decimal_to_float(plan.car_maintenance_monthly),
-		"car_tax_monthly": _decimal_to_float(plan.car_tax_monthly),
-  		"car_interest_rate": _decimal_to_float(plan.car_interest_rate),
+        "car_maintenance_monthly": _decimal_to_float(plan.car_maintenance_monthly),
+        "car_tax_monthly": _decimal_to_float(plan.car_tax_monthly),
+        "car_interest_rate": _decimal_to_float(plan.car_interest_rate),
+        "savings_return_rate": _decimal_to_float(plan.savings_return_rate),
         "created_at": plan.created_at,
         "periods": [_serialize_period(p) for p in periods],
     }
@@ -214,10 +228,11 @@ def create_plan(payload: LongtermPlanCreate, db: Session = Depends(get_db)) -> L
         car_monthly_rate=payload.car_monthly_rate,
         car_term_months=payload.car_term_months,
         car_insurance_monthly=payload.car_insurance_monthly,
-		car_fuel_monthly=payload.car_fuel_monthly,
-		car_maintenance_monthly=payload.car_maintenance_monthly,
-		car_tax_monthly=payload.car_tax_monthly,
-  		car_interest_rate=payload.car_interest_rate,
+                car_fuel_monthly=payload.car_fuel_monthly,
+                car_maintenance_monthly=payload.car_maintenance_monthly,
+                car_tax_monthly=payload.car_tax_monthly,
+                car_interest_rate=payload.car_interest_rate,
+        savings_return_rate=payload.savings_return_rate,
     )
     db.add(plan)
     db.commit()
@@ -236,6 +251,9 @@ def get_plan(plan_id: int, db: Session = Depends(get_db)) -> dict:
             joinedload(LongtermPlan.periods)
             .joinedload(LongtermPeriod.expense_templates)
             .joinedload(LongtermPeriodExpenseTemplateLink.template),
+            joinedload(LongtermPlan.periods)
+            .joinedload(LongtermPeriod.savings_templates)
+            .joinedload(LongtermPeriodSavingTemplateLink.template),
         )
         .filter(LongtermPlan.id == plan_id)
         .first()
@@ -277,6 +295,7 @@ def replace_periods(
 
     income_template_ids = {template_id for item in payload.periods for template_id in item.income_template_ids}
     expense_template_ids = {template_id for item in payload.periods for template_id in item.expense_template_ids}
+    saving_template_ids = {template_id for item in payload.periods for template_id in item.saving_template_ids}
 
     if income_template_ids:
         found_income_templates = {t.id for t in db.query(IncomeTemplate).filter(IncomeTemplate.id.in_(income_template_ids))}
@@ -296,6 +315,15 @@ def replace_periods(
                 detail=f"Expense templates not found: {sorted(missing_expenses)}",
             )
 
+    if saving_template_ids:
+        found_saving_templates = {t.id for t in db.query(SavingTemplate).filter(SavingTemplate.id.in_(saving_template_ids))}
+        missing_savings = saving_template_ids - found_saving_templates
+        if missing_savings:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Saving templates not found: {sorted(missing_savings)}",
+            )
+
     plan.starting_balance = payload.starting_balance
     try:
         plan.financing_start_month = _parse_optional_month(payload.financing_start_month)
@@ -311,6 +339,7 @@ def replace_periods(
     plan.car_maintenance_monthly = payload.car_maintenance_monthly
     plan.car_tax_monthly = payload.car_tax_monthly
     plan.car_interest_rate = payload.car_interest_rate
+    plan.savings_return_rate = payload.savings_return_rate
     plan.periods.clear()
     for period_payload in payload.periods:
         try:
@@ -330,6 +359,10 @@ def replace_periods(
                 LongtermPeriodExpenseTemplateLink(template_id=template_id)
                 for template_id in period_payload.expense_template_ids
             ],
+            savings_templates=[
+                LongtermPeriodSavingTemplateLink(template_id=template_id)
+                for template_id in period_payload.saving_template_ids
+            ],
         )
         plan.periods.append(period)
 
@@ -343,6 +376,8 @@ def replace_periods(
             .joinedload(LongtermPeriodIncomeTemplateLink.template),
             joinedload(LongtermPeriod.expense_templates)
             .joinedload(LongtermPeriodExpenseTemplateLink.template),
+            joinedload(LongtermPeriod.savings_templates)
+            .joinedload(LongtermPeriodSavingTemplateLink.template),
         )
         .filter(LongtermPeriod.plan_id == plan.id)
         .order_by(LongtermPeriod.start_month, LongtermPeriod.id)

@@ -1,8 +1,10 @@
 let plan = null;
 let incomeTemplates = [];
 let expenseTemplates = [];
+let savingTemplates = [];
 let incomeEntries = [];
 let expenseEntries = [];
+let savingEntries = [];
 
 function parseNumberInput(id) {
     const el = document.getElementById(id);
@@ -158,12 +160,14 @@ async function initDetail() {
     }
 
     try {
-        const [planResponse, incomesResponse, expensesResponse, incomeTemplatesResponse, expenseTemplatesResponse] = await Promise.all([
+        const [planResponse, incomesResponse, expensesResponse, incomeTemplatesResponse, expenseTemplatesResponse, savingsResponse, savingTemplatesResponse] = await Promise.all([
             apiRequest(`/longterm/plans/${id}`),
             apiRequest('/incomes'),
             apiRequest('/expenses'),
             apiRequest('/templates/income'),
             apiRequest('/templates/expense'),
+            apiRequest('/savings'),
+            apiRequest('/templates/saving'),
         ]);
 
         plan = planResponse;
@@ -171,11 +175,14 @@ async function initDetail() {
         expenseEntries = expensesResponse;
         incomeTemplates = incomeTemplatesResponse;
         expenseTemplates = expenseTemplatesResponse;
+        savingEntries = savingsResponse;
+        savingTemplates = savingTemplatesResponse;
 
         document.getElementById('planTitle').textContent = plan.name;
         const descEl = document.getElementById('planDescription');
         descEl.textContent = plan.description || 'No Description.';
         document.getElementById('startingBalance').value = Number(plan.starting_balance || 0);
+        setInputValue('savingsReturnRate', plan.savings_return_rate ?? 7);
         setInputValue('financingStartMonth', toMonthInput(plan.financing_start_month));
         setInputValue('purchasePrice', plan.car_purchase_price ?? 0);
         setInputValue('downPayment', plan.car_down_payment ?? 0);
@@ -195,7 +202,8 @@ async function initDetail() {
                 start: toMonthInput(period.start_month),
                 end: toMonthInput(period.end_month),
                 incomeTemplateIds: period.income_template_ids || [],
-                expenseTemplateIds: period.expense_template_ids || []
+                expenseTemplateIds: period.expense_template_ids || [],
+                savingTemplateIds: period.saving_template_ids || []
             }));
         } else {
             addPeriodRow(getPresetRange());
@@ -264,6 +272,11 @@ function addPeriodRow(defaults = {}) {
       <div class="template-checklist expense-checklist"></div>
     </div>
 
+    <div class="form-group">
+      <label>Savings Templates</label>
+      <div class="template-checklist saving-checklist"></div>
+    </div>
+
     <div class="form-group period-actions">
       <button type="button" class="btn-delete remove-period">Remove</button>
     </div>
@@ -284,6 +297,13 @@ function addPeriodRow(defaults = {}) {
     expenseTemplates,
     defaults.expenseTemplateIds || [],
     'expense'
+  );
+
+  renderTemplateChecklist(
+    row.querySelector('.saving-checklist'),
+    savingTemplates,
+    defaults.savingTemplateIds || [],
+    'saving'
   );
 
   row.querySelector('.remove-period').addEventListener('click', () => row.remove());
@@ -334,6 +354,11 @@ function sumIncomeEntries(entries) {
     return entries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
 }
 
+function sumSavingEntries(entries) {
+    if (!entries || !entries.length) return 0;
+    return entries.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+}
+
 function calculateMonthlyExpenses(entries, date) {
     if (!entries || !entries.length) return 0;
     const month = date.getMonth() + 1;
@@ -365,19 +390,19 @@ function applyFinancingToProjection(monthMap, financing) {
     for (let i = 0; i < financing.termMonths; i++) {
         const current = addMonths(startDate, i);
         const key = monthKey(current);
-        const existing = monthMap.get(key) || { date: new Date(current), income: 0, expense: 0 };
+        const existing = monthMap.get(key) || { date: new Date(current), income: 0, expense: 0, savings: 0 };
         existing.expense += monthlyCosts;
         monthMap.set(key, existing);
     }
 
     const startKey = monthKey(startDate);
-    const startEntry = monthMap.get(startKey) || { date: new Date(startDate), income: 0, expense: 0 };
+    const startEntry = monthMap.get(startKey) || { date: new Date(startDate), income: 0, expense: 0, savings: 0 };
     startEntry.expense += financing.downPayment;
     monthMap.set(startKey, startEntry);
 
     const endDate = addMonths(startDate, Math.max(financing.termMonths - 1, 0));
     const endKey = monthKey(endDate);
-    const endEntry = monthMap.get(endKey) || { date: new Date(endDate), income: 0, expense: 0 };
+    const endEntry = monthMap.get(endKey) || { date: new Date(endDate), income: 0, expense: 0, savings: 0 };
     endEntry.expense += financing.finalPayment;
     monthMap.set(endKey, endEntry);
 
@@ -410,13 +435,20 @@ function collectPeriods() {
     end: row.querySelector('.period-end').value,
     incomeTemplateIds: getCheckedIds(row, '.income-template-checkbox'),
     expenseTemplateIds: getCheckedIds(row, '.expense-template-checkbox'),
+    savingTemplateIds: getCheckedIds(row, '.saving-template-checkbox'),
   }));
 }
 
 async function savePeriods() {
     const startingBalance = Number(document.getElementById('startingBalance').value || 0);
+    const savingsReturnRate = Number(document.getElementById('savingsReturnRate').value || 0);
     if (Number.isNaN(startingBalance)) {
         showMessage('projectionMessage', 'Bitte eine gültige Start-Balance eingeben.', 'error');
+        return;
+    }
+
+    if (savingsReturnRate < 0) {
+        showMessage('projectionMessage', 'Rendite kann nicht negativ sein.', 'error');
         return;
     }
 
@@ -438,7 +470,8 @@ async function savePeriods() {
             start_month: period.start,
             end_month: period.end,
             income_template_ids: period.incomeTemplateIds,
-            expense_template_ids: period.expenseTemplateIds
+            expense_template_ids: period.expenseTemplateIds,
+            saving_template_ids: period.savingTemplateIds
         });
     }
 
@@ -454,10 +487,11 @@ async function savePeriods() {
                 car_monthly_rate: financing.monthlyRate,
                 car_term_months: financing.termMonths,
                 car_insurance_monthly: financing.carInsuranceMonthly,
-				car_fuel_monthly: financing.carFuelMonthly,
-				car_maintenance_monthly: financing.carMaintenanceMonthly,
-				car_tax_monthly: financing.carTaxMonthly,
-				car_interest_rate: financing.interestRate,
+                car_fuel_monthly: financing.carFuelMonthly,
+                car_maintenance_monthly: financing.carMaintenanceMonthly,
+                car_tax_monthly: financing.carTaxMonthly,
+                car_interest_rate: financing.interestRate,
+                savings_return_rate: savingsReturnRate,
                 periods: payload
             }
         });
@@ -471,7 +505,13 @@ async function savePeriods() {
 
 function generateProjection() {
     const startingBalance = Number(document.getElementById('startingBalance').value || 0);
+    const savingsReturnRate = Number(document.getElementById('savingsReturnRate').value || 0);
     const financing = collectFinancingData();
+
+    if (savingsReturnRate < 0) {
+        showMessage('projectionMessage', 'Rendite kann nicht negativ sein.', 'error');
+        return;
+    }
 
     const periods = collectPeriods();
     if (!periods.length) {
@@ -495,13 +535,16 @@ function generateProjection() {
 
         const periodIncomeEntries = collectTemplateEntries(period.incomeTemplateIds, incomeTemplates, 'incomes');
         const periodExpenseEntries = collectTemplateEntries(period.expenseTemplateIds, expenseTemplates, 'expenses');
+        const periodSavingEntries = collectTemplateEntries(period.savingTemplateIds, savingTemplates, 'savings');
         const monthlyIncome = sumIncomeEntries(periodIncomeEntries);
+        const monthlySavings = sumSavingEntries(periodSavingEntries);
 
         months.forEach(date => {
             const key = monthKey(date);
-            const existing = monthMap.get(key) || { date: new Date(date), income: 0, expense: 0 };
+            const existing = monthMap.get(key) || { date: new Date(date), income: 0, expense: 0, savings: 0 };
             existing.income += monthlyIncome;
             existing.expense += calculateMonthlyExpenses(periodExpenseEntries, date);
+            existing.savings += monthlySavings;
             monthMap.set(key, existing);
         });
     }
@@ -516,24 +559,32 @@ function generateProjection() {
     const rows = Array.from(monthMap.values())
         .sort((a, b) => a.date - b.date)
         .map(item => {
-            const net = item.income - item.expense;
+            const net = item.income - item.expense - (item.savings || 0);
             return { ...item, net };
         });
 
     let balance = startingBalance;
+    let savingTotal = 0;
+    let investedBalance = 0;
+    const monthlyReturnRate = Math.max(0, Number(savingsReturnRate) || 0) / 100 / 12;
     const rowsWithBalance = rows.map(r => {
         balance += r.net;
+        savingTotal += r.savings || 0;
+        investedBalance = (investedBalance + (r.savings || 0)) * (1 + monthlyReturnRate);
         return {
             ...r,
-            balance
+            balance,
+            savingTotal,
+            investedBalance,
+            totalWealth: balance + investedBalance,
         };
     });
 
-    renderTable(rowsWithBalance, startingBalance, periods, financing);
+    renderTable(rowsWithBalance, startingBalance, periods, financing, savingsReturnRate);
     showMessage('projectionMessage', 'Refreshed.', 'success');
 }
 
-function renderTable(rows, startingBalance, periods, financing) {
+function renderTable(rows, startingBalance, periods, financing, savingsReturnRate) {
     const container = document.getElementById('projectionTable');
     if (!rows.length) {
         container.innerHTML = '';
@@ -543,7 +594,8 @@ function renderTable(rows, startingBalance, periods, financing) {
     const periodSummary = periods.map((p, idx) => {
         const incomeName = templateNames(incomeTemplates, p.incomeTemplateIds);
         const expenseName = templateNames(expenseTemplates, p.expenseTemplateIds);
-        return `#${idx + 1}: ${p.start} → ${p.end} • Income: ${incomeName} • Expense: ${expenseName}`;
+        const savingName = templateNames(savingTemplates, p.savingTemplateIds);
+        return `#${idx + 1}: ${p.start} → ${p.end} • Income: ${incomeName} • Expense: ${expenseName} • Saving: ${savingName}`;
     }).join('<br>');
 
     const runningCosts =
@@ -569,7 +621,7 @@ function renderTable(rows, startingBalance, periods, financing) {
     const header = `
         <div class=\"entry-details\" style=\"margin-bottom:10px;\">
             Start Balance: <strong>${formatCurrency(startingBalance)}</strong> •
-            ${periods.length} Zeitraum(e)
+            ${periods.length} Zeitraum(e) • Rendite Sparrate: ${Number(savingsReturnRate || 0).toFixed(2)}% p.a.
         </div>
         ${periodSummary ? `<div class=\"entry-details\" style=\"margin-bottom:10px;\">${periodSummary}</div>` : ''}
         ${financingDetails}
@@ -582,8 +634,12 @@ function renderTable(rows, startingBalance, periods, financing) {
                     <th>Monat</th>
                     <th class=\"text-right\">Income</th>
                     <th class=\"text-right\">Expense</th>
+                    <th class=\"text-right\">Saving</th>
                     <th class=\"text-right\">Netto</th>
+                    <th class=\"text-right\">Sparkonto</th>
+                    <th class=\"text-right\">Sparanlage (mit Rendite)</th>
                     <th class=\"text-right\">Balance</th>
+                    <th class=\"text-right\">Gesamtvermögen</th>
                 </tr>
             </thead>
             <tbody>
@@ -592,8 +648,12 @@ function renderTable(rows, startingBalance, periods, financing) {
                         <td>${formatMonth(r.date)}</td>
                         <td class=\"text-right\">${formatCurrency(r.income)}</td>
                         <td class=\"text-right\">${formatCurrency(r.expense)}</td>
+                        <td class=\"text-right\">${formatCurrency(r.savings || 0)}</td>
                         <td class=\"text-right\">${formatCurrency(r.net)}</td>
+                        <td class=\"text-right\">${formatCurrency(r.savingTotal)}</td>
+                        <td class=\"text-right\">${formatCurrency(r.investedBalance)}</td>
                         <td class=\"text-right\">${formatCurrency(r.balance)}</td>
+                        <td class=\"text-right\">${formatCurrency(r.totalWealth)}</td>
                     </tr>
                 `).join('')}
             </tbody>
