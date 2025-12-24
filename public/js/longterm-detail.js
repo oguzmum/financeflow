@@ -182,6 +182,7 @@ async function initDetail() {
         const descEl = document.getElementById('planDescription');
         descEl.textContent = plan.description || 'No Description.';
         document.getElementById('startingBalance').value = Number(plan.starting_balance || 0);
+        document.getElementById('startingSavingBalance').value = Number(plan.starting_saving_balance || 0);
         setInputValue('savingsReturnRate', plan.savings_return_rate ?? 7);
         setInputValue('financingStartMonth', toMonthInput(plan.financing_start_month));
         setInputValue('purchasePrice', plan.car_purchase_price ?? 0);
@@ -441,9 +442,15 @@ function collectPeriods() {
 
 async function savePeriods() {
     const startingBalance = Number(document.getElementById('startingBalance').value || 0);
+    const startingSavingBalance = Number(document.getElementById('startingSavingBalance').value || 0);
     const savingsReturnRate = Number(document.getElementById('savingsReturnRate').value || 0);
     if (Number.isNaN(startingBalance)) {
         showMessage('projectionMessage', 'Bitte eine gültige Start-Balance eingeben.', 'error');
+        return;
+    }
+
+    if (Number.isNaN(startingSavingBalance)) {
+        showMessage('projectionMessage', 'Bitte eine gültige Start-Sparsumme eingeben.', 'error');
         return;
     }
 
@@ -480,6 +487,7 @@ async function savePeriods() {
             method: 'PUT',
             body: {
                 starting_balance: startingBalance,
+                starting_saving_balance: startingSavingBalance,
                 financing_start_month: financing.startMonth || null,
                 car_purchase_price: financing.purchasePrice,
                 car_down_payment: financing.downPayment,
@@ -496,6 +504,7 @@ async function savePeriods() {
             }
         });
         document.getElementById('startingBalance').value = Number(plan.starting_balance || 0);
+        document.getElementById('startingSavingBalance').value = Number(plan.starting_saving_balance || 0);
         showMessage('projectionMessage', 'Zeiträume gespeichert.', 'success');
     } catch (error) {
         console.error(error);
@@ -505,11 +514,17 @@ async function savePeriods() {
 
 function generateProjection() {
     const startingBalance = Number(document.getElementById('startingBalance').value || 0);
+    const startingSavingBalance = Number(document.getElementById('startingSavingBalance').value || 0);
     const savingsReturnRate = Number(document.getElementById('savingsReturnRate').value || 0);
     const financing = collectFinancingData();
 
     if (savingsReturnRate < 0) {
         showMessage('projectionMessage', 'Rendite kann nicht negativ sein.', 'error');
+        return;
+    }
+
+    if (Number.isNaN(startingSavingBalance)) {
+        showMessage('projectionMessage', 'Bitte eine gültige Start-Sparsumme eingeben.', 'error');
         return;
     }
 
@@ -559,13 +574,13 @@ function generateProjection() {
     const rows = Array.from(monthMap.values())
         .sort((a, b) => a.date - b.date)
         .map(item => {
-            const net = item.income - item.expense - (item.savings || 0);
-            return { ...item, net };
-        });
+        const net = item.income - item.expense - (item.savings || 0);
+        return { ...item, net };
+    });
 
     let balance = startingBalance;
-    let savingTotal = 0;
-    let investedBalance = 0;
+    let savingTotal = startingSavingBalance;
+    let investedBalance = startingSavingBalance;
     const monthlyReturnRate = Math.max(0, Number(savingsReturnRate) || 0) / 100 / 12;
     const rowsWithBalance = rows.map(r => {
         balance += r.net;
@@ -575,16 +590,16 @@ function generateProjection() {
             ...r,
             balance,
             savingTotal,
-            investedBalance,
-            totalWealth: balance + investedBalance,
-        };
+        investedBalance,
+        totalWealth: balance + investedBalance,
+    };
     });
 
-    renderTable(rowsWithBalance, startingBalance, periods, financing, savingsReturnRate);
+    renderTable(rowsWithBalance, startingBalance, startingSavingBalance, periods, financing, savingsReturnRate);
     showMessage('projectionMessage', 'Refreshed.', 'success');
 }
 
-function renderTable(rows, startingBalance, periods, financing, savingsReturnRate) {
+function renderTable(rows, startingBalance, startingSavingBalance, periods, financing, savingsReturnRate) {
     const container = document.getElementById('projectionTable');
     if (!rows.length) {
         container.innerHTML = '';
@@ -621,6 +636,7 @@ function renderTable(rows, startingBalance, periods, financing, savingsReturnRat
     const header = `
         <div class=\"entry-details\" style=\"margin-bottom:10px;\">
             Start Balance: <strong>${formatCurrency(startingBalance)}</strong> •
+            Sparkonto Start: <strong>${formatCurrency(startingSavingBalance)}</strong> •
             ${periods.length} Zeitraum(e) • Rendite Sparrate: ${Number(savingsReturnRate || 0).toFixed(2)}% p.a.
         </div>
         ${periodSummary ? `<div class=\"entry-details\" style=\"margin-bottom:10px;\">${periodSummary}</div>` : ''}

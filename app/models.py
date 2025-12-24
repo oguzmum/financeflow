@@ -135,6 +135,7 @@ class LongtermPlan(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     starting_balance = Column(Numeric(12, 2), nullable=False, default=0)
+    starting_saving_balance = Column(Numeric(12, 2), nullable=False, default=0)
     financing_start_month = Column(Date, nullable=True)
     car_purchase_price = Column(Numeric(12, 2), nullable=False, default=0)
     car_down_payment = Column(Numeric(12, 2), nullable=False, default=0)

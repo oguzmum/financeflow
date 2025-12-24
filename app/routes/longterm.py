@@ -75,6 +75,7 @@ class LongtermPlanCreate(BaseModel):
     name: str = Field(..., max_length=255)
     description: Optional[str] = None
     starting_balance: Decimal = Field(default=0)
+    starting_saving_balance: Decimal = Field(default=0)
     financing_start_month: Optional[str] = Field(default=None, pattern=r"^\d{4}-\d{2}$")
     car_purchase_price: Decimal = Field(default=0)
     car_down_payment: Decimal = Field(default=0)
@@ -96,6 +97,7 @@ class LongtermPlanRead(BaseModel):
     name: str
     description: Optional[str]
     starting_balance: Decimal
+    starting_saving_balance: Decimal
     financing_start_month: Optional[date]
     car_purchase_price: Decimal
     car_down_payment: Decimal
@@ -137,6 +139,7 @@ class LongtermPlanDetail(LongtermPlanRead):
 
 class LongtermPeriodReplacePayload(BaseModel):
     starting_balance: Decimal = Field(default=0)
+    starting_saving_balance: Decimal = Field(default=0)
     financing_start_month: Optional[str] = Field(default=None, pattern=r"^\d{4}-\d{2}$")
     car_purchase_price: Decimal = Field(default=0)
     car_down_payment: Decimal = Field(default=0)
@@ -188,6 +191,7 @@ def _serialize_plan(plan: LongtermPlan) -> dict:
         "name": plan.name,
         "description": plan.description,
         "starting_balance": _decimal_to_float(plan.starting_balance),
+        "starting_saving_balance": _decimal_to_float(plan.starting_saving_balance),
         "financing_start_month": plan.financing_start_month,
         "car_purchase_price": _decimal_to_float(plan.car_purchase_price),
         "car_down_payment": _decimal_to_float(plan.car_down_payment),
@@ -221,6 +225,7 @@ def create_plan(payload: LongtermPlanCreate, db: Session = Depends(get_db)) -> L
         name=payload.name,
         description=payload.description,
         starting_balance=payload.starting_balance,
+        starting_saving_balance=payload.starting_saving_balance,
         financing_start_month=financing_start_month,
         car_purchase_price=payload.car_purchase_price,
         car_down_payment=payload.car_down_payment,
@@ -325,6 +330,7 @@ def replace_periods(
             )
 
     plan.starting_balance = payload.starting_balance
+    plan.starting_saving_balance = payload.starting_saving_balance
     try:
         plan.financing_start_month = _parse_optional_month(payload.financing_start_month)
     except ValueError as exc:
