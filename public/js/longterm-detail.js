@@ -596,6 +596,7 @@ function generateProjection() {
     });
 
     renderTable(rowsWithBalance, startingBalance, startingSavingBalance, periods, financing, savingsReturnRate);
+    renderWealthGraph(rowsWithBalance);
     showMessage('projectionMessage', 'Refreshed.', 'success');
 }
 
@@ -678,6 +679,194 @@ function renderTable(rows, startingBalance, startingSavingBalance, periods, fina
 
     container.innerHTML = header + table;
 }
+
+function renderWealthGraph(rows) {
+    const canvas = document.getElementById('totalWealthChart');
+    const chartMessage = document.getElementById('projectionChartMessage');
+    const downloadBtn = document.getElementById('downloadChartBtn');
+
+    if (!canvas || !chartMessage || !downloadBtn) return;
+
+    if (!rows || !rows.length) {
+        chartMessage.textContent = 'No data available yet.';
+        canvas.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        return;
+    }
+
+    const labels = rows.map(r => formatMonth(r.date));
+    const values = rows.map(r => Number(r.totalWealth || 0));
+
+    drawLineChart(canvas, labels, values);
+
+    chartMessage.textContent = 'Total wealth over time.';
+    canvas.style.display = 'block';
+    downloadBtn.style.display = 'inline-block';
+    downloadBtn.onclick = () => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'total-wealth.png';
+        link.click();
+    };
+}
+
+function drawLineChart(canvas, labels, values) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx || !values || !values.length) return;
+
+    const ratio = window.devicePixelRatio || 1;
+    const width = Math.max(360, (canvas.parentElement?.clientWidth || 800) - 24);
+    const height = 340;
+
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    ctx.save();
+    ctx.scale(ratio, ratio);
+
+    // clear + white background (important for download)
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, height);
+
+    // layout
+    const paddingLeft = 72;   // room for y-axis labels
+    const paddingRight = 20;
+    const paddingTop = 20;
+    const paddingBottom = 54; // room for x-axis labels
+    const plotX = paddingLeft;
+    const plotY = paddingTop;
+    const plotWidth = width - paddingLeft - paddingRight;
+    const plotHeight = height - paddingTop - paddingBottom;
+
+    // min/max + range
+    const rawMax = Math.max(...values);
+    const rawMin = Math.min(...values);
+    const minVal = Math.min(0, rawMin); // show 0 line if possible
+    const maxVal = Math.max(0, rawMax);
+    const range = Math.max(1e-9, maxVal - minVal);
+
+    const xForIndex = (idx) => {
+        if (labels.length === 1) return plotX;
+        return plotX + (plotWidth * (idx / (labels.length - 1)));
+    };
+
+    const yForValue = (val) => {
+        return plotY + ((maxVal - val) / range) * plotHeight;
+    };
+
+    const points = values.map((val, idx) => ({
+        x: xForIndex(idx),
+        y: yForValue(val)
+    }));
+
+    // helper: nice y-grid values
+    function niceStep(roughStep) {
+        const pow = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const n = roughStep / pow;
+        let nice;
+        if (n <= 1) nice = 1;
+        else if (n <= 2) nice = 2;
+        else if (n <= 5) nice = 5;
+        else nice = 10;
+        return nice * pow;
+    }
+
+    const targetGridLines = 5;
+    const stepVal = niceStep(range / targetGridLines);
+    const gridMin = Math.floor(minVal / stepVal) * stepVal;
+    const gridMax = Math.ceil(maxVal / stepVal) * stepVal;
+
+    // grid lines (horizontal)
+    ctx.strokeStyle = '#e6e6e6';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    for (let v = gridMin; v <= gridMax + stepVal / 2; v += stepVal) {
+        const y = yForValue(v);
+        ctx.beginPath();
+        ctx.moveTo(plotX, y);
+        ctx.lineTo(plotX + plotWidth, y);
+        ctx.stroke();
+    }
+
+    // y-axis labels
+    ctx.fillStyle = '#666';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let v = gridMin; v <= gridMax + stepVal / 2; v += stepVal) {
+        const y = yForValue(v);
+        ctx.fillText(formatCurrency(v), plotX - 10, y);
+    }
+
+    // axes
+    ctx.strokeStyle = '#555';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    // y axis
+    ctx.moveTo(plotX, plotY);
+    ctx.lineTo(plotX, plotY + plotHeight);
+    // x axis
+    ctx.lineTo(plotX + plotWidth, plotY + plotHeight);
+    ctx.stroke();
+
+    // 0-baseline (dashed) if 0 is within visible range
+    if (minVal <= 0 && maxVal >= 0) {
+        const y0 = yForValue(0);
+        ctx.strokeStyle = '#cfcfcf';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(plotX, y0);
+        ctx.lineTo(plotX + plotWidth, y0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // line
+    ctx.strokeStyle = '#2b7cff';
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    points.forEach((p, idx) => {
+        if (idx === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+    });
+    ctx.stroke();
+
+    // points
+    ctx.fillStyle = '#2b7cff';
+    points.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    // x-axis labels (reduced density)
+    ctx.fillStyle = '#444';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+
+    const step = Math.max(1, Math.floor(labels.length / 6));
+    for (let i = 0; i < labels.length; i++) {
+        if (i % step !== 0 && i !== labels.length - 1) continue;
+        const x = points[i].x;
+        ctx.fillText(labels[i], x, plotY + plotHeight + 10);
+    }
+
+    // title (optional small)
+    ctx.fillStyle = '#222';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Total Wealth', plotX, 6);
+
+    ctx.restore();
+}
+
 
 function formatMonth(date) {
     return date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
