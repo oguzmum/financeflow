@@ -1,0 +1,8 @@
+- [ ] Fix overall calculation logic (align with Excel model)
+- [ ] Create Docker image and deploy to home server
+- [ ] Include fixed outcomes at a specific month/year in calculations
+- [ ] Automatically calculate monthly rate (trigger on input change / keydown)
+- [ ] Support multiple bankaccounts 
+- [ ] Implement "Sparkassenformel"
+- [ ] Add short summary in planning view (before entering detail; time range, start capital, end capital)
+- [ ] Allow deleting long-term plans
