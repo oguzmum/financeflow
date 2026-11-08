@@ -1,0 +1,27 @@
+# --- Personal financial data: never commit ---
+docs/money-manager-example/
+# Personal data profile, mappings, real account/category names (see README › Privacy)
+docs/private/
+data/
+*.csv
+*.xlsx
+*.xls
+# Anonymized test fixtures are the exception (see WP-02)
+!**/fixtures/**/*.csv
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Build output (stack TBD, see WP-12)
+target/
+build/
+dist/
+node_modules/

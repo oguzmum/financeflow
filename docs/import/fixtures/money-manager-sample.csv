@@ -1,0 +1,31 @@
+Period;Accounts;Category;Subcategory;Note;EUR;Income/Expense;Tag;Description;Amount;Currency;Accounts
+28.02.2025, 21:05:10;Girokonto;Restaurant;Abendessen;Pizza;23,5;Exp.;;;23,5;EUR;23,5
+28.02.2025, 09:12:44;Girokonto;Gehalt;Arbeitgeber A;;2850,40;Income;;;2850,40;EUR;2850,40
+27.02.2025, 18:30:02;Girokonto;Lebensmittel;Supermarkt;Supermarkt;54,87;Exp.;;;54,87;EUR;54,87
+26.02.2025, 12:00:00;Girokonto;Abos & Verträge;Kino;Kino;12,99;Exp.;;;12,99;EUR;12,99
+25.02.2025, 16:45:21;Girokonto;Freizeit;Kino;Kino;14;Exp.;;;14;EUR;14
+24.02.2025, 10:20:15;Tagesgeld;Geschäftskonto;;;300;Transfer-In;;;300;EUR;300
+24.02.2025, 10:20:15;Geschäftskonto;Tagesgeld;;;300;Transfer-Out;;;300;EUR;300
+23.02.2025, 19:00:00;Bargeld;Modified Bal.;;;4,30000000000001;Exp.;;;4,3;EUR;4,3
+22.02.2025, 15:10:33;Bargeld;Restaurant;Café;Café;3,8;Exp.;;;3,8;EUR;3,8
+22.02.2025, 08:05:47;Bargeld;Restaurant;Café;Café;3,8;Exp.;;;3,8;EUR;3,8
+21.02.2025, 12:12:12;Depot;Modified Bal.;;;152,37;Income Balance;;;152,37;EUR;152,37
+20.02.2025, 11:00:09;Bargeld;Girokonto;;;50;Transfer-In;;;50;EUR;50
+20.02.2025, 11:00:09;Girokonto;Bargeld;;;50;Transfer-Out;;;50;EUR;50
+19.02.2025, 01:14:09;Bargeld;Sonstige;;;7,90000000000009;Income;;;7,9;EUR;7,9
+18.02.2025, 19:22:58;Girokonto;Einkaufen;Sonstiges;Geschenk 🎁;35;Exp.;;Geschenk für eine Freundin;35;EUR;35
+17.02.2025, 09:41:30;Depot;Zinsen & Dividenden;;;3,41;Income;;;3,41;EUR;3,41
+16.02.2025, 14:03:55;Bargeld;Modified Bal.;;;2,5;Expense Balance;;;2,5;EUR;2,5
+15.02.2025, 13:37:00;Girokonto;Mobilität;Tanken;Tanken;61,02;Exp.;;;61,02;EUR;61,02
+14.02.2025, 17:20:00;Altes Girokonto;Einkaufen (alt);;Hose;39,99;Exp.;;;39,99;EUR;39,99
+13.02.2025, 20:31:44;Altes Girokonto;Freizeit (alt);Friseur;Friseur;25;Exp.;;;25;EUR;25
+12.02.2025, 07:55:30;Girokonto;Mobilität Fix;Kredit;Kredit;1249;Exp.;;;1249;EUR;1249
+11.02.2025, 10:00:07;Altes Girokonto;Verträge/Abos;Handy Vertrag;Handy;15,99;Exp.;;;15,99;EUR;15,99
+10.02.2025, 20:14:11;Geschäftskonto;Nebengewerbe;Plattform A;;19,99;Income;;;19,99;EUR;19,99
+05.02.2025, 10:16:52;Tagesgeld;Girokonto;;;150;Transfer-In;;;150;EUR;150
+05.02.2025, 10:16:52;Girokonto;Tagesgeld;;;150;Transfer-Out;;;150;EUR;150
+03.02.2025, 17:40:05;Girokonto;Gesundheit;;Apotheke;10;Exp.;;;10;EUR;10
+02.02.2025, 12:30:00;Girokonto;Sonstiges;Gebühren;Gebühr Amt;1012,5;Exp.;;;1012,5;EUR;1012,5
+01.02.2025, 23:59:59;Girokonto;Versicherung;Haftpflicht;Haftpflicht;89,17;Exp.;;;89,17;EUR;89,17
+01.02.2025, 06:01:13;Girokonto;Sonstige;;;5;Income;;;5;EUR;5
+01.02.2025, 00:00:01;Tagesgeld;Lebensmittel;Drogerie;Drogerie;7,45;Exp.;;;7,45;EUR;7,45
