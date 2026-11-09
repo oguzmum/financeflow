@@ -20,13 +20,13 @@ Written by me, reviewed by Claude.
 | Money representation & rounding | WP-06 |
 | Transfers between own accounts | WP-05 |
 | Category evolution (rename/split/merge) | WP-07 |
-| Migration identity & re-runnability | WP-08 |
+| ~~Migration identity & re-runnability~~ (dropped: reset and re-run, FR-IMP-3) | WP-08 |
 | Accounts model (hierarchy, derived vs. stored balances) | WP-34 |
 | ~~Capture availability~~ (dropped: online-only, see Q12) | WP-36 |
 | Audit trail for transaction changes | WP-35 |
 | Architectural style & module boundaries | WP-11 |
 | Tech stack | WP-12 |
-| Authentication | WP-14 |
+| Authentication (deferred to P2 with the login) | WP-14 |
 | Backup & restore | WP-15 |
 | Import source extensibility (maybe: YAGNI?) | WP-16 |
 | Projections: computed vs. persisted | P2 |

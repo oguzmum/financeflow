@@ -42,6 +42,6 @@ Know the import format precisely before designing anything around it. Real data 
 - A transfer appears as **two rows** (Out + In) with the same timestamp. In transfer rows, `Category` holds the _counter-account_.
 - The sample contains accounts that weren't in the account list (cash, brokerage).
 
-Think about what this means for WP-05 (transfers) and WP-08 (identity) before reading further.
+Think about what this means for WP-05 (transfers) and WP-16 (migration pipeline) before reading further.
 
 ## Log

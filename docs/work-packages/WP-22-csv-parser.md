@@ -14,7 +14,7 @@ Parse the export into source-independent import records. This is the first _adap
 ## Definition of done
 
 - [ ] Parser turns the fixture file from WP-02 into typed records; invalid rows become reported errors, not exceptions that abort everything
-- [ ] Normalization rules applied (whitespace, encoding, dates) as decided in WP-08
+- [ ] Normalization rules applied (whitespace, encoding, dates) as described in `docs/import/money-manager-csv.md`
 - [ ] Full real export parses without errors (run locally, not in CI)
 - [ ] Reviewed by Claude
 

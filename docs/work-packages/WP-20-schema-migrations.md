@@ -14,7 +14,7 @@ Implement the ER design from WP-09 as versioned migrations.
 ## Definition of done
 
 - [ ] Migrations create all MVP tables, constraints and indexes
-- [ ] No category seed (§2.2). Only what the app technically needs to start
+- [ ] No category seed (requirements §2.4). Only what the app technically needs to start
 - [ ] Constraint tests: invalid data is rejected by the DB (e.g. transfer legs don't sum to 0)
 - [ ] Reviewed by Claude
 

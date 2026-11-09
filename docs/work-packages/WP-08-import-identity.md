@@ -4,8 +4,10 @@
 | -------------- | -------------------------------------------------------------------- |
 | **Owner**      | `me`                                                                 |
 | **Phase**      | 2 · Domain model                                                     |
-| **Status**     | todo                                                                 |
+| **Status**     | dropped |
 | **Depends on** | [WP-02](WP-02-profile-csv-export.md), [WP-04](WP-04-domain-model.md) |
+
+> **Dropped (2026-11-09):** the migration is re-run by *reset and re-run* (FR-IMP-3) and nothing checks for duplicates, so row identity isn't needed. The idempotency idea lives on in WP-35 (double submit must not create a duplicate).
 
 ## Goal
 

@@ -13,7 +13,7 @@ Design the two-level category tree plus rename/split/merge (QA-4, FR-CAT-\*), an
 
 ## Definition of done
 
-- [ ] No default categories (§2.2). Decided: does the migration _map_ Money Manager categories onto a hand-made tree, _create_ the tree from them, or both?
+- [ ] No default categories (requirements §2.4). Decided: does the migration _map_ Money Manager categories onto a hand-made tree, _create_ the tree from them, or both?
 - [ ] Decided: is the tree fixed at 2 levels or generic (adjacency list)? Why?
 - [ ] Decided: where fixed/variable lives (main or sub level?)
 - [ ] Decided for each of rename / merge / split: does history follow the new category, or keep the old one? What does a report for 2021 show after a 2026 merge?

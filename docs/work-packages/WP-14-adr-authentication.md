@@ -4,8 +4,10 @@
 | -------------- | ----------------------------------------------------------------------- |
 | **Owner**      | `me`                                                                    |
 | **Phase**      | 3 · Architecture & stack                                                |
-| **Status**     | todo                                                                    |
+| **Status**     | deferred (P2) |
 | **Depends on** | [WP-12](WP-12-adr-tech-stack.md), [WP-01](WP-01-refine-requirements.md) |
+
+> **Deferred to P2 (2026-11-09):** login is P2 (FR-X-1). For the MVP, network access (LAN/VPN only) is the only protection (C-3, C-9). Pick this up together with the login.
 
 ## Goal
 
@@ -30,7 +32,7 @@ Decide how the single-user login works (QA-8, FR-X-1).
 
 ## Notes
 
-Implementation by Claude in WP-27.
+Implementation by Claude when login is built (P2).
 
 ## Log
 

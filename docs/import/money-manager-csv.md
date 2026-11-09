@@ -1,6 +1,6 @@
 # Money Manager CSV export — format specification
 
-> Input for the parser (WP-22), transfers (WP-05), money representation (WP-06), category mapping (WP-07), migration identity (WP-08) and the accounts model (WP-34).
+> Input for the parser (WP-22), transfers (WP-05), money representation (WP-06), category mapping (WP-07), migration pipeline (WP-16) and the accounts model (WP-34).
 > **Basis:** profiling of a real multi-year export with a few thousand rows (2019–2026).
 > This document describes the **format only**. All account and category names in it are invented. The real data profile (accounts, categories, counts) is kept in the git-ignored `docs/private/` folder.
 
@@ -121,8 +121,8 @@ Key insights:
 | Q-3 | **Float artifacts** in amounts (`7,90000000000009`) | Never parse as float. Round to cents, assert the deviation is tiny (WP-06) |
 | Q-4 | Amounts with 0, 1 or 2 decimals (`46`, `12,5`, `6,14`) | Don't assume exactly 2 decimals |
 | Q-5 | No thousands separator | A `.` in an amount is an error |
-| Q-6 | Shared timestamps occur **only** within transfer pairs | Timestamp to the second is almost unique (WP-08) |
-| Q-7 | Same day, account, category, subcategory and amount: the "two coffees" case **exists** | Rows differ only in time of day (WP-08) |
+| Q-6 | Shared timestamps occur **only** within transfer pairs | Useful for matching transfer pairs (§3.1) |
+| Q-7 | Same day, account, category, subcategory and amount: the "two coffees" case **exists** | Both rows are real. Never de-duplicate on content (WP-24) |
 | Q-8 | Bookings after midnight | No issue: `Period` holds the chosen booking date (E3) |
 | Q-9 | Emoji and special characters in free text | Full UTF-8 everywhere |
 | Q-10 | Balance corrections (§3.2) | Not income or expense |

@@ -15,7 +15,7 @@ The heart of FR-IMP-3/4/5: preview classification and an idempotent, atomic comm
 
 - [ ] Preview classifies each row: new / duplicate / unmapped / invalid
 - [ ] Commit is atomic; importing the same file twice yields 0 new rows (test)
-- [ ] All WP-08 cases covered by tests (identical coffees, overlapping periods, edited source row)
+- [ ] Edge cases from WP-02 covered by tests: two identical coffees on one day are **both** imported (no accidental de-duplication), transfer pairs become one transfer, balance corrections stay corrections
 - [ ] Undo of an import batch works
 - [ ] Transfers created according to WP-05
 - [ ] Reviewed by Claude

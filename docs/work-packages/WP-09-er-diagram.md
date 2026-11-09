@@ -5,7 +5,7 @@
 | **Owner**      | `me`                                                                                                                                                                           |
 | **Phase**      | 2 · Domain model                                                                                                                                                               |
 | **Status**     | todo                                                                                                                                                                           |
-| **Depends on** | [WP-05](WP-05-transfers.md), [WP-06](WP-06-money-representation.md), [WP-07](WP-07-category-evolution.md), [WP-08](WP-08-import-identity.md), [WP-34](WP-34-accounts-model.md) |
+| **Depends on** | [WP-05](WP-05-transfers.md), [WP-06](WP-06-money-representation.md), [WP-07](WP-07-category-evolution.md), [WP-34](WP-34-accounts-model.md) |
 
 ## Goal
 

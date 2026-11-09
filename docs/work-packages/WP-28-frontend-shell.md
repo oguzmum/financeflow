@@ -1,4 +1,4 @@
-# WP-28: Frontend shell, components, login
+# WP-28: Frontend shell & components
 
 |                |                                                                                                          |
 | -------------- | -------------------------------------------------------------------------------------------------------- |
@@ -9,13 +9,13 @@
 
 ## Goal
 
-App frame based on the design system: navigation, layout (mobile + desktop), login, shared components, German formatting.
+App frame based on the design system: navigation, layout (mobile + desktop), shared components, German formatting.
 
 ## Definition of done
 
 - [ ] Responsive shell with navigation
 - [ ] Component set from WP-17 implemented
-- [ ] Login screen working end to end
+- [ ] App reachable end to end in the dev environment (no login in the MVP)
 
 ## Log
 

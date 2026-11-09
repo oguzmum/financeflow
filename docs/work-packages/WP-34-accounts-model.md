@@ -9,7 +9,7 @@
 
 ## Goal
 
-Model the accounts from requirements §2.1b: sub-accounts, cash, brokerage, business account (FR-ACC-\*).
+Model the accounts from requirements §2.3: sub-accounts, cash, brokerage, business account (FR-ACC-\*).
 
 ## Definition of done
 
