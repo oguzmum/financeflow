@@ -22,7 +22,7 @@
 | Buchung | Booking | Umbrella term: anything that changes an account's balance. One of: income, expense, transfer, balance correction. | Database transaction (that's why the code term is `Booking`, not `Transaction`) |
 | Einnahme | Income | Money that comes into my accounts from outside (salary, dividends, refunds). Increases my wealth. | Transfer *in* (just moves money) |
 | Ausgabe | Expense | Money that leaves my accounts to the outside world. Decreases my wealth. | Transfer *out* |
-| Umbuchung | Transfer | Money moved between two of my own accounts. Changes both balances, but never counts as income or expense. | Income/expense |
+| Umbuchung | Transfer | Money moved between two of my own accounts. **One** booking with a source and a target account. Changes both balances, but never counts as income or expense. | Income/expense |
 | Saldokorrektur | Balance correction | Sets an account's balance to its real value (e.g. after counting cash) by booking the difference, with a direction: increase or decrease. Not income, not expense. | Income/expense in category "Sonstiges" |
 | Betrag | Amount | A positive money value in EUR, exact to the cent, stored as integer cents. Direction comes from the kind of booking (and a correction's direction), not from a sign ([ADR-0001](../adr/0001-money-representation.md)). | — |
 | Buchungsdatum | Booking date | The calendar day a booking belongs to. Determines the month in reports. No time of day. | Time of entry |
@@ -82,6 +82,6 @@ Money Manager uses some words differently. These translations belong to the impo
 
 1. ~~"Transaction" collides with "database transaction"~~ **Decided (WP-04):** code term `Booking`.
 2. **Is "sub-account" a type or a relation?** FR-ACC-1 lists `sub-account` as an account *type*, but it's also defined by having a parent. An emergency-fund sub-account is still a savings/checking account. Probably the type is redundant → WP-34.
-3. **One transfer, two accounts.** A transfer touches two accounts; income/expense touch one. Is a transfer *one* booking or *two*? → WP-05.
+3. ~~**One transfer, two accounts.**~~ **Decided (WP-05, [ADR-0002](../adr/0002-transfers-and-corrections.md)):** one booking with a source and a target account.
 4. ~~**Correction direction.**~~ **Decided (WP-06, [ADR-0001](../adr/0001-money-representation.md)):** positive amount + explicit direction (increase | decrease).
 5. **Business = account (MVP).** Fine for the migration, but a business expense paid from a private account would count as private. Acceptable for now → long-term in WP-34 (Q14).

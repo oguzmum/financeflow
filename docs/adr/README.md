@@ -12,13 +12,14 @@ Written by me, reviewed by Claude.
 | ADR | Title | Status | Work package |
 |---|---|---|---|
 | [0001](0001-money-representation.md) | Money representation & rounding | Accepted | WP-06 |
+| [0002](0002-transfers-and-corrections.md) | Transfers and balance corrections | Accepted | WP-05 |
 
 ## Planned ADRs
 
 | Topic | Work package |
 |---|---|
 | ~~Money representation & rounding~~ → [ADR-0001](0001-money-representation.md) | WP-06 |
-| Transfers between own accounts | WP-05 |
+| ~~Transfers between own accounts~~ → [ADR-0002](0002-transfers-and-corrections.md) | WP-05 |
 | Category evolution (rename/split/merge) | WP-07 |
 | ~~Migration identity & re-runnability~~ (dropped: reset and re-run, FR-IMP-3) | WP-08 |
 | Accounts model (hierarchy, derived vs. stored balances) | WP-34 |

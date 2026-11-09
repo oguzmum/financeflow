@@ -4,7 +4,7 @@
 | -------------- | ------------------------------ |
 | **Owner**      | `me`                           |
 | **Phase**      | 2 · Domain model               |
-| **Status**     | todo                           |
+| **Status**     | done                           |
 | **Depends on** | [WP-04](WP-04-domain-model.md) |
 
 ## Goal
@@ -13,10 +13,10 @@ Decide how money moving between my own accounts is represented so it moves balan
 
 ## Definition of done
 
-- [ ] ADR written covering at least: (a) transaction with a `type` column, (b) two linked rows, (c) double-entry style transaction with entries
-- [ ] Answered: how standing orders (P2) and the brokerage account fit later
-- [ ] Answered: how a Money Manager transfer row maps onto the model (input: WP-02)
-- [ ] Reviewed by Claude
+- [x] ADR written covering at least: (a) transaction with a `type` column, (b) two linked rows, (c) double-entry style transaction with entries
+- [x] Answered: how standing orders (P2) and the brokerage account fit later
+- [x] Answered: how a Money Manager transfer row maps onto the model (input: WP-02)
+- [x] Reviewed by Claude
 
 ## Learning goals & concepts
 
@@ -31,4 +31,4 @@ Decide how money moving between my own accounts is represented so it moves balan
 
 ## Log
 
-_(decisions, links to ADRs/diagrams, review notes)_
+- 2026-11-09: Decided in [ADR-0002](../adr/0002-transfers-and-corrections.md): option (a), one booking with `account` + `to_account`; corrections are a kind with a direction; double entry rejected as overkill
