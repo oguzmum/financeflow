@@ -2,7 +2,7 @@
 
 > **What this shows:** the core concepts of FinanceFlow and how they relate, in the terms of the [glossary](../domain/glossary.md).
 > **What it omits:** IDs, foreign keys, data types and tables (that's the ER diagram, WP-09); P2/P3 concepts (standing orders, projections, ETFs).
-> **Status:** WP-04 done. Open decisions are marked as notes and get resolved in WP-05 (transfers), WP-06 (money), WP-07 (categories) and WP-34 (accounts).
+> **Status:** WP-04 done. Money is decided in [ADR-0001](../adr/0001-money-representation.md). Open decisions are marked as notes and get resolved in WP-05 (transfers), WP-07 (categories) and WP-34 (accounts).
 
 ```mermaid
 classDiagram
@@ -26,7 +26,7 @@ classDiagram
         }
         class Amount {
             <<value object>>
-            value
+            cents
             currency = EUR
         }
         class Category {
@@ -66,7 +66,7 @@ classDiagram
     ImportRun ..> Mapping : uses
     ImportRun ..> Booking : creates
 
-    note for Booking "kind = income | expense | transfer | correction.\nHow a transfer touches two accounts,\nand whether a correction has a direction,\nis decided in WP-05."
+    note for Booking "kind = income | expense | transfer | correction.\nHow a transfer touches two accounts\nis decided in WP-05.\nCorrection: positive amount + direction\n(increase | decrease), ADR-0001."
     note for Category "kind = income | expense.\ncostType (fixed | variable) only on\nexpense main categories (FR-CAT-2)."
     note for Account "type: is 'sub-account' a type or just\nthe parent relation? (WP-34)\nbusiness: MVP rule FR-ACC-5."
 ```

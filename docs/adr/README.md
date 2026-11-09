@@ -11,13 +11,13 @@ Written by me, reviewed by Claude.
 
 | ADR | Title | Status | Work package |
 |---|---|---|---|
-| — | *(none yet)* | | |
+| [0001](0001-money-representation.md) | Money representation & rounding | Accepted | WP-06 |
 
 ## Planned ADRs
 
 | Topic | Work package |
 |---|---|
-| Money representation & rounding | WP-06 |
+| ~~Money representation & rounding~~ → [ADR-0001](0001-money-representation.md) | WP-06 |
 | Transfers between own accounts | WP-05 |
 | Category evolution (rename/split/merge) | WP-07 |
 | ~~Migration identity & re-runnability~~ (dropped: reset and re-run, FR-IMP-3) | WP-08 |
