@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: FinanceFlow API
+  version: 0.1.0
+  description: |
+    Contract-first API between the React frontend and the Spring Boot app (ADR-0006).
+    Skeleton only (WP-19): the real contract is designed in WP-26.
+    Conventions already fixed: amounts are integer cents (ADR-0001), dates are YYYY-MM-DD strings.
+servers:
+  - url: /api
+tags:
+  - name: system
+    description: Technical endpoints
+paths:
+  /system/info:
+    get:
+      tags: [system]
+      operationId: getSystemInfo
+      summary: Name and version of the running app
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemInfo"
+components:
+  schemas:
+    SystemInfo:
+      type: object
+      required: [name, version]
+      properties:
+        name:
+          type: string
+          example: FinanceFlow
+        version:
+          type: string
+          example: 0.1.0-SNAPSHOT

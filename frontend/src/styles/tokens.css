@@ -1,0 +1,78 @@
+/* Design tokens: copied from the WP-17 design system artifact (project/tokens.css, version 1794341894-b4c8). Do not edit by hand; update from the artifact. */
+:root, [data-theme="light"] {
+  --ground: #f4f6f8;
+  --surface: #ffffff;
+  --surface-sunken: #eceff3;
+  --line: #d9dee5;
+  --line-strong: #7f8998;
+  --ink: #17202b;
+  --ink-muted: #556070;
+  --accent: #23488a;
+  --accent-soft: #e3eaf6;
+  --on-accent: #ffffff;
+  --income: #1d7146;
+  --income-soft: #e2f2e8;
+  --expense: #a8441f;
+  --expense-soft: #f8e7de;
+  --transfer: #4f5b6b;
+  --transfer-soft: #e8ecf1;
+  --correction: #7d5b00;
+  --correction-soft: #f6edd3;
+  --danger: #b3261e;
+  --danger-soft: #fbe4e2;
+  --fixed: #23488a;
+  --variable: #7f8998;
+  --shadow-raised: 0 1px 2px rgba(23,32,43,0.08);
+  --shadow-overlay: 0 8px 24px rgba(23,32,43,0.16);
+}
+[data-theme="dark"] {
+  --ground: #101419;
+  --surface: #181d24;
+  --surface-sunken: #0c0f13;
+  --line: #2a313b;
+  --line-strong: #6b7584;
+  --ink: #e6eaf0;
+  --ink-muted: #9ca6b4;
+  --accent: #8db0ee;
+  --accent-soft: #1d2a40;
+  --on-accent: #0d1626;
+  --income: #5cc48c;
+  --income-soft: #15301f;
+  --expense: #f0915f;
+  --expense-soft: #3a2116;
+  --transfer: #a7b1bf;
+  --transfer-soft: #252c36;
+  --correction: #e2b64a;
+  --correction-soft: #352a0e;
+  --danger: #ff8f86;
+  --danger-soft: #3d1715;
+  --fixed: #8db0ee;
+  --variable: #6b7584;
+  --shadow-raised: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-overlay: 0 8px 24px rgba(0,0,0,0.6);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 999px;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+.text-title { font-family: var(--font-sans); font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.text-heading { font-family: var(--font-sans); font-size: 16px; line-height: 24px; font-weight: 600; }
+.text-body { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 400; }
+.text-body-strong { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 600; }
+.text-small { font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 400; }
+.text-label { font-family: var(--font-sans); font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; }
+.amount-hero { font-family: var(--font-sans); font-size: 36px; line-height: 40px; font-weight: 500; letter-spacing: -0.02em; }
+.amount-lg { font-family: var(--font-sans); font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.01em; }
+.amount { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 500; }
+.text-mono { font-family: var(--font-mono); font-size: 12px; line-height: 16px; font-weight: 400; }

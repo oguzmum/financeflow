@@ -1,0 +1,156 @@
+/* Components: copied from the WP-17 design system artifact (project/components/bundle.css, version 1794341894-b4c8).
+   Change vs. the artifact: the Google Fonts @import is removed (C-4: no third parties at runtime); fonts are self-hosted via @fontsource in main.tsx. */
+/* FinanceFlow components — plain CSS, framework-agnostic. Prefix: ff-. Values come from tokens.css only. */
+
+html { background: var(--ground); color: var(--ink); }
+body { margin: 0; font-family: var(--font-sans); font-size: 14px; line-height: 20px; color: var(--ink); background: var(--ground); -webkit-font-smoothing: antialiased; }
+*, *::before, *::after { box-sizing: border-box; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Preview scaffolding */
+.ff-demo { padding: var(--space-4); display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.ff-demo-col { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.ff-muted { color: var(--ink-muted); }
+
+/* ---------- Amount ---------- */
+.ff-amount { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; font-weight: 500; text-align: right; }
+.ff-amount--income { color: var(--income); }
+.ff-amount--expense { color: var(--expense); }
+.ff-amount--transfer { color: var(--transfer); }
+.ff-amount--correction { color: var(--correction); }
+.ff-amount--neutral { color: var(--ink); }
+
+/* ---------- Kind badge ---------- */
+.ff-kind { display: inline-flex; align-items: center; gap: var(--space-1); padding: 2px 6px; border-radius: var(--radius-sm); font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
+.ff-kind--income { color: var(--income); background: var(--income-soft); }
+.ff-kind--expense { color: var(--expense); background: var(--expense-soft); }
+.ff-kind--transfer { color: var(--transfer); background: var(--transfer-soft); }
+.ff-kind--correction { color: var(--correction); background: var(--correction-soft); }
+
+/* ---------- Category chip ---------- */
+.ff-chip { display: inline-flex; align-items: center; gap: var(--space-1); max-width: 100%; padding: 2px 8px 2px 6px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font-size: 12px; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ff-chip__dot { flex: none; width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--variable); }
+.ff-chip--fixed .ff-chip__dot { background: var(--fixed); }
+.ff-chip__sub { color: var(--ink-muted); }
+.ff-chip__sub::before { content: "›"; margin: 0 4px 0 2px; color: var(--ink-muted); }
+button.ff-chip { cursor: pointer; font: inherit; font-size: 12px; }
+button.ff-chip:hover { background: var(--accent-soft); }
+.ff-chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* ---------- Buttons ---------- */
+.ff-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 36px; padding: 0 var(--space-4); border: 1px solid transparent; border-radius: var(--radius-md); font: inherit; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.ff-btn--primary { background: var(--accent); color: var(--on-accent); }
+.ff-btn--primary:hover { filter: brightness(1.08); }
+.ff-btn--secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.ff-btn--secondary:hover { background: var(--accent-soft); }
+.ff-btn--ghost { background: transparent; color: var(--accent); }
+.ff-btn--ghost:hover { background: var(--accent-soft); }
+.ff-btn--danger { background: var(--surface); color: var(--danger); border-color: var(--danger); }
+.ff-btn--lg { min-height: var(--space-7); padding: 0 var(--space-5); font-size: 16px; }
+.ff-btn--block { width: 100%; }
+.ff-btn:disabled, .ff-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; filter: none; }
+
+/* ---------- Form fields ---------- */
+.ff-field { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.ff-field__label { font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.ff-input { width: 100%; min-height: 40px; padding: 0 var(--space-3); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font: inherit; font-size: 16px; }
+.ff-input::placeholder { color: var(--ink-muted); }
+.ff-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+.ff-input--amount { font-variant-numeric: tabular-nums; text-align: right; }
+.ff-input-wrap { position: relative; display: flex; align-items: center; }
+.ff-input-wrap .ff-input { padding-right: 32px; }
+.ff-input-wrap__suffix { position: absolute; right: var(--space-3); color: var(--ink-muted); pointer-events: none; }
+select.ff-input { appearance: none; padding-right: 32px; background-image: linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%), linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%); background-position: calc(100% - 17px) 50%, calc(100% - 12px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+.ff-field__help { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.ff-field--error .ff-input { border-color: var(--danger); }
+.ff-field--error .ff-field__help { color: var(--danger); }
+
+/* ---------- Segmented control (booking kind) ---------- */
+.ff-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 2px; border-radius: var(--radius-md); background: var(--surface-sunken); }
+.ff-seg__opt { min-height: 36px; padding: 0 var(--space-2); border: 0; border-radius: calc(var(--radius-md) - 2px); background: transparent; color: var(--ink-muted); font: inherit; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.ff-seg__opt[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-raised); }
+.ff-seg__opt[aria-pressed="true"][data-kind="expense"] { color: var(--expense); }
+.ff-seg__opt[aria-pressed="true"][data-kind="income"] { color: var(--income); }
+.ff-seg__opt[aria-pressed="true"][data-kind="transfer"] { color: var(--transfer); }
+
+/* ---------- Card ---------- */
+.ff-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-raised); padding: var(--space-4); min-width: 0; }
+.ff-card__head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); margin-bottom: var(--space-2); }
+.ff-card__title { font-size: 16px; line-height: 24px; font-weight: 600; margin: 0; }
+.ff-card__meta { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.ff-balance { font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.ff-subaccounts { list-style: none; margin: var(--space-3) 0 0; padding: var(--space-2) 0 0; border-top: 1px solid var(--line); display: grid; gap: var(--space-1); }
+.ff-subaccounts li { display: flex; justify-content: space-between; gap: var(--space-2); font-size: 13px; }
+.ff-subaccounts li span:first-child { color: var(--ink-muted); }
+.ff-tag { display: inline-block; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); font-size: 11px; line-height: 16px; font-weight: 600; color: var(--ink-muted); }
+
+/* ---------- Table (booking list) ---------- */
+.ff-table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.ff-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
+.ff-table th { position: sticky; top: 0; background: var(--surface-sunken); text-align: left; font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); padding: var(--space-2) var(--space-3); white-space: nowrap; }
+.ff-table td { padding: var(--space-2) var(--space-3); border-top: 1px solid var(--line); vertical-align: middle; }
+.ff-table tbody tr:hover td { background: var(--accent-soft); }
+.ff-table .num { text-align: right; }
+.ff-table .ff-day td { background: var(--ground); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--ink-muted); padding-top: 6px; padding-bottom: 6px; }
+.ff-table .ff-day td.num { font-weight: 500; }
+.ff-table tfoot td { border-top: 2px solid var(--line-strong); font-weight: 600; }
+.ff-note { color: var(--ink-muted); font-size: 12px; }
+
+/* Mobile list rows (same data as the table, stacked) */
+.ff-rows { list-style: none; margin: 0; padding: 0; background: var(--surface); }
+.ff-rows__day { display: flex; justify-content: space-between; padding: 6px var(--space-4); background: var(--ground); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--ink-muted); }
+.ff-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-3); padding: 10px var(--space-4); border-top: 1px solid var(--line); }
+.ff-row__main { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ff-row__meta { grid-column: 1; font-size: 12px; line-height: 16px; color: var(--ink-muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ff-row .ff-amount { grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+
+/* ---------- Navigation ---------- */
+.ff-bottomnav { display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; background: var(--surface); border-top: 1px solid var(--line); padding: 0 max(4px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(4px, env(safe-area-inset-left, 0px)); }
+.ff-bottomnav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; color: var(--ink-muted); text-decoration: none; font-size: 11px; line-height: 14px; font-weight: 600; }
+.ff-bottomnav a[aria-current="page"] { color: var(--accent); }
+.ff-bottomnav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.ff-fab { justify-self: center; align-self: center; display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border: 0; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow-overlay); cursor: pointer; transform: translateY(-10px); }
+.ff-fab svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 2.25; fill: none; stroke-linecap: round; }
+
+.ff-sidebar { display: flex; flex-direction: column; gap: var(--space-1); width: 232px; padding: var(--space-4) var(--space-3); background: var(--surface); border-right: 1px solid var(--line); }
+.ff-sidebar__brand { font-weight: 600; font-size: 16px; padding: var(--space-1) var(--space-2) var(--space-3); letter-spacing: -0.01em; }
+.ff-sidebar__section { margin-top: var(--space-4); padding: 0 var(--space-2) var(--space-1); font-size: 11px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.ff-sidebar a { display: flex; align-items: center; gap: var(--space-2); min-height: 34px; padding: 0 var(--space-2); border-radius: var(--radius-md); color: var(--ink); text-decoration: none; font-weight: 500; }
+.ff-sidebar a:hover { background: var(--accent-soft); }
+.ff-sidebar a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.ff-sidebar a .ff-amount { margin-left: auto; font-size: 12px; color: var(--ink-muted); }
+.ff-sidebar svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.ff-sidebar .ff-btn { margin-bottom: var(--space-2); }
+
+/* ---------- Charts ---------- */
+.ff-chart { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-sans); }
+.ff-chart .grid { stroke: var(--line); stroke-width: 1; }
+.ff-chart .axis { fill: var(--ink-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.ff-chart .bar-income { fill: var(--income); }
+.ff-chart .bar-expense { fill: var(--expense); }
+.ff-chart .bar-fixed { fill: var(--fixed); }
+.ff-chart .bar-variable { fill: var(--variable); }
+.ff-chart .line-balance { fill: none; stroke: var(--accent); stroke-width: 2; }
+.ff-chart .area-balance { fill: var(--accent-soft); }
+.ff-chart .dot-end { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.ff-chart .value { fill: var(--ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ff-legend { display: flex; flex-wrap: wrap; gap: var(--space-3); font-size: 12px; color: var(--ink-muted); }
+.ff-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ff-legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.ff-meter { display: flex; height: 8px; border-radius: var(--radius-sm); overflow: hidden; background: var(--surface-sunken); }
+.ff-meter > i { display: block; height: 100%; }
+.ff-catbars { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px var(--space-3); align-items: center; font-size: 13px; }
+.ff-catbars .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--surface-sunken); overflow: hidden; margin-bottom: 4px; }
+.ff-catbars .bar > i { display: block; height: 100%; border-radius: 3px; }
+
+/* ---------- Capture form ---------- */
+.ff-capture { display: flex; flex-direction: column; gap: var(--space-3); background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: var(--space-3) var(--space-4) var(--space-4); box-shadow: var(--shadow-overlay); }
+.ff-capture__grab { align-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--line-strong); }
+.ff-capture__amount { display: flex; align-items: baseline; justify-content: flex-end; gap: 6px; padding: var(--space-2) var(--space-1) var(--space-1); border-bottom: 2px solid var(--accent); font-size: 36px; line-height: 40px; font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ff-capture__amount .cur { font-size: 20px; color: var(--ink-muted); }
+.ff-capture__amount .caret { width: 2px; height: 32px; background: var(--accent); align-self: center; }
+.ff-capture__row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.ff-capture__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ff-capture__hint { font-size: 12px; line-height: 16px; color: var(--ink-muted); text-align: center; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

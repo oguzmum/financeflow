@@ -43,4 +43,55 @@ Each work package says who owns it (`me` / `claude`).
 
 ## Tech stack
 
-To be decided (see [WP-10](docs/work-packages/WP-10-architecture-options.md) and [WP-12](docs/work-packages/WP-12-adr-tech-stack.md)). Fixed so far: PostgreSQL, container-based and deployment-agnostic (all configuration via environment variables).
+Decided in [ADR-0005](docs/adr/0005-architectural-style.md) (modular monolith) and [ADR-0006](docs/adr/0006-tech-stack.md):
+Java 25 + Spring Boot + Spring Modulith, jOOQ + Flyway on PostgreSQL, React + TypeScript + Vite, contract-first OpenAPI, one app container + a backup sidecar.
+
+## Development
+
+### Prerequisites
+
+- JDK 25
+- Docker (running): jOOQ generates its classes from a throwaway PostgreSQL (Testcontainers), and the integration tests use one too
+- Node is **not** required: Maven downloads it into `target/node`. For `npm run dev` you need Node 24 locally.
+
+### Build and test
+
+```sh
+./mvnw verify                          # everything: codegen, backend + frontend build, unit + integration tests, lint/format checks
+./mvnw verify -Djooq.codegen.skip=true # without Docker: skips jOOQ codegen; integration tests skip themselves
+./mvnw spotless:apply                  # format Java code
+cd frontend && npm run format          # format frontend code
+```
+
+What `verify` runs:
+
+| Step | Tool |
+|---|---|
+| OpenAPI → Spring interfaces | openapi-generator (`api/openapi.yaml`) |
+| Flyway migrations → throwaway PostgreSQL → jOOQ classes | `src/build/JooqCodegen.java` (Testcontainers) |
+| Frontend: OpenAPI → TS types, typecheck, build into `target/classes/static` | openapi-typescript, tsc, Vite |
+| Unit tests | JUnit 5 + AssertJ, Vitest + Testing Library |
+| Module boundaries (ADR-0005) | Spring Modulith `verify()`, ArchUnit (`ModularityTest`, `ArchitectureRulesTest`) |
+| Integration tests (`*IT`) | Spring Boot + Testcontainers PostgreSQL |
+| Lint / format | Spotless (palantir-java-format), ESLint, Prettier |
+
+Module docs (PlantUML) are written to `target/spring-modulith-docs/`.
+
+### Run locally (development)
+
+```sh
+docker compose -f docker-compose.dev.yml up -d   # PostgreSQL on localhost:5432
+./mvnw spring-boot:run -Djooq.codegen.skip=true  # app on http://localhost:8080 (migrates the dev DB)
+cd frontend && npm install && npm run dev        # optional: Vite dev server with hot reload, proxies /api to :8080
+```
+
+### Run the production-like stack
+
+```sh
+cp .env.example .env    # fill in passwords; keep a copy in your password manager (ADR-0007)
+mkdir -p backups        # or the directory set in BACKUP_DIR
+./mvnw verify           # builds target/financeflow-*.jar
+docker compose up -d --build
+```
+
+Compose starts the app, its own PostgreSQL (no exposed port) and a placeholder backup sidecar (implemented in WP-32).

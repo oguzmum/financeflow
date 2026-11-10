@@ -1,0 +1,44 @@
+# CI (WP-19): build, lint, test. Runs on GitHub Actions; Gitea/Forgejo Actions use the same syntax.
+# Docker is available on the hosted runner, so jOOQ codegen and Testcontainers integration tests run here.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Cache Node download and npm packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            target/node
+            ~/.npm
+          key: node-${{ hashFiles('frontend/package-lock.json') }}
+
+      # verify = jOOQ codegen (Testcontainers) + OpenAPI codegen + compile + frontend build
+      #          + unit tests (backend, frontend) + integration tests + lint/format checks (Spotless, ESLint, Prettier)
+      - name: Build, lint and test
+        run: ./mvnw -B verify
+
+      - name: Upload Spring Modulith docs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spring-modulith-docs
+          path: target/spring-modulith-docs
+          if-no-files-found: ignore

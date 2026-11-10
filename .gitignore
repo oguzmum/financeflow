@@ -3,6 +3,10 @@ docs/money-manager-example/
 # Personal data profile, mappings, real account/category names (see README › Privacy)
 docs/private/
 data/
+# Database dumps contain the full financial history (ADR-0007)
+backups/
+*.dump
+*.sql.gz
 *.csv
 *.xlsx
 *.xls
@@ -20,8 +24,10 @@ data/
 .vscode/
 *.iml
 
-# Build output (stack TBD, see WP-12)
+# Build output (ADR-0006: Maven, Vite)
 target/
 build/
 dist/
 node_modules/
+# Generated from api/openapi.yaml at build time
+frontend/src/api/schema.d.ts

@@ -36,10 +36,10 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | [WP-13](WP-13-c4-diagrams.md)                 | C4 context & container diagrams                        | `me`     | 3     | WP-11, WP-12               | done          |
 | [WP-14](WP-14-adr-authentication.md)          | ADR: Authentication                                    | `me`     | 3     | WP-12, WP-01               | deferred (P2) |
 | [WP-15](WP-15-adr-backup.md)                  | ADR: Backup & restore                                  | `me`     | 3     | WP-13                      | done          |
-| [WP-16](WP-16-import-pipeline-design.md)      | Migration pipeline design & sequence diagram           | `me`     | 4     | WP-07, WP-11               | todo          |
+| [WP-16](WP-16-import-pipeline-design.md)      | Migration pipeline design & sequence diagram           | `me`     | 4     | WP-07, WP-11               | in progress   |
 | [WP-17](WP-17-design-system.md)               | Design system artifact                                 | `claude` | 5     | WP-01                      | in progress   |
 | [WP-18](WP-18-mvp-screen-design.md)           | MVP screen designs                                     | `claude` | 5     | WP-17, WP-16               | todo          |
-| [WP-19](WP-19-project-skeleton.md)            | Project skeleton, tooling, CI, dev environment         | `claude` | 7     | WP-12, WP-11               | todo          |
+| [WP-19](WP-19-project-skeleton.md)            | Project skeleton, tooling, CI, dev environment         | `claude` | 7     | WP-12, WP-11               | in progress   |
 | [WP-20](WP-20-schema-migrations.md)           | MVP schema migrations                                  | `me`     | 6     | WP-09, WP-19               | todo          |
 | [WP-21](WP-21-money-type.md)                  | Money type & German formatting                         | `me`     | 6     | WP-06, WP-19               | todo          |
 | [WP-22](WP-22-csv-parser.md)                  | Money Manager CSV parser (adapter)                     | `me`     | 6     | WP-02, WP-16, WP-21        | todo          |

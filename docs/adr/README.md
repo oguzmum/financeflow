@@ -18,6 +18,7 @@ Written by me, reviewed by Claude.
 | [0005](0005-architectural-style.md) | Architectural style & module boundaries | Accepted | WP-11 |
 | [0006](0006-tech-stack.md) | Tech stack | Accepted | WP-12 |
 | [0007](0007-backup-and-restore.md) | Backup & restore | Accepted | WP-15 |
+| [0008](0008-migration-pipeline.md) | Migration pipeline | Proposed | WP-16 |
 
 ## Planned ADRs
 
@@ -34,5 +35,5 @@ Written by me, reviewed by Claude.
 | ~~Tech stack~~ → [ADR-0006](0006-tech-stack.md) | WP-12 |
 | Authentication (deferred to P2 with the login) | WP-14 |
 | ~~Backup & restore~~ → [ADR-0007](0007-backup-and-restore.md) | WP-15 |
-| Import source extensibility (maybe: YAGNI?) | WP-16 |
+| ~~Import source extensibility (maybe: YAGNI?)~~ → [ADR-0008](0008-migration-pipeline.md) §8: one small port, no plugins | WP-16 |
 | Projections: computed vs. persisted | P2 |

@@ -1,0 +1,3 @@
+# Only the built jar is needed (see Dockerfile)
+*
+!target/financeflow-*.jar

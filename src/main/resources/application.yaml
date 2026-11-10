@@ -1,0 +1,40 @@
+# All configuration comes from environment variables (C-1). Defaults are for local development only
+# (docker-compose.dev.yml). See .env.example for the production variables.
+spring:
+  application:
+    name: financeflow
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/financeflow}
+    username: ${DB_APP_USER:financeflow}
+    password: ${DB_APP_PASSWORD:financeflow}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+  flyway:
+    # Migrations run at app start (ADR-0006) with the owner role (ADR-0006: DB roles; separate roles in WP-32)
+    user: ${DB_OWNER_USER:${spring.datasource.username}}
+    password: ${DB_OWNER_PASSWORD:${spring.datasource.password}}
+  jooq:
+    sql-dialect: postgres
+
+server:
+  port: ${PORT:8080}
+  tomcat:
+    threads:
+      max: 20
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+financeflow:
+  version: '@project.version@'
