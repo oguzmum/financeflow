@@ -4,7 +4,7 @@
 | -------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **Owner**      | `me`                                                                                                               |
 | **Phase**      | 4 · Import flow design                                                                                             |
-| **Status**     | in progress                                                                                                               |
+| **Status**     | done                                                                                                                      |
 | **Depends on** | [WP-07](WP-07-category-evolution.md), [WP-11](WP-11-adr-architectural-style.md) |
 
 ## Goal
@@ -34,4 +34,5 @@ Design the migration flow: upload → parse → stage → map (categories _and_ 
 
 ## Log
 
-- 2026-11-10: Decided in a Q&A session; Claude wrote [ADR-0008](../adr/0008-migration-pipeline.md), [seq-csv-import.md](../diagrams/seq-csv-import.md), [state-import-batch.md](../diagrams/state-import-batch.md). In-memory batch; migration file in YAML, edited by hand, wizard validates; reset script + empty-ledger guard; only explained rejections (ignore list); closed accounts not at 0 → fix at source; one small source port. Claude's addition: preview as a rolled-back dry run of the real commit. The 'dedupe' step from the goal is obsolete (FR-IMP-3). Review pending.
+- 2026-11-10: Decided in a Q&A session; Claude wrote [ADR-0008](../adr/0008-migration-pipeline.md), [seq-csv-import.md](../diagrams/seq-csv-import.md), [state-import-batch.md](../diagrams/state-import-batch.md). In-memory batch; migration file in YAML, edited by hand, wizard validates; reset script + empty-ledger guard; only explained rejections (ignore list); closed accounts not at 0 → fix at source; one small source port. Claude's addition: preview as a rolled-back dry run of the real commit. The 'dedupe' step from the goal is obsolete (FR-IMP-3).
+- 2026-11-10: Reviewed. Claude's additions accepted (dry-run preview, ignore by raw line, one immutable batch at a time, dedupe step obsolete). ADR-0008 Accepted.

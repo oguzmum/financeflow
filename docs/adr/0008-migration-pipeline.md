@@ -1,6 +1,6 @@
 # ADR-0008: Migration pipeline
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-10
 - **Related:** FR-IMP-1 to FR-IMP-4, QA-2 (top 3), QA-6, S-2.1 to S-2.3, ADR-0001 to ADR-0005, [CSV spec](../import/money-manager-csv.md), [er-mvp](../diagrams/er-mvp.md), [seq-csv-import](../diagrams/seq-csv-import.md), [state-import-batch](../diagrams/state-import-batch.md), WP-16, WP-22, WP-23, WP-24, WP-30, WP-33
 

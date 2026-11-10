@@ -18,7 +18,7 @@ Written by me, reviewed by Claude.
 | [0005](0005-architectural-style.md) | Architectural style & module boundaries | Accepted | WP-11 |
 | [0006](0006-tech-stack.md) | Tech stack | Accepted | WP-12 |
 | [0007](0007-backup-and-restore.md) | Backup & restore | Accepted | WP-15 |
-| [0008](0008-migration-pipeline.md) | Migration pipeline | Proposed | WP-16 |
+| [0008](0008-migration-pipeline.md) | Migration pipeline | Accepted | WP-16 |
 
 ## Planned ADRs
 
