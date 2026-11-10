@@ -31,3 +31,8 @@ A walking skeleton: empty app that builds, tests, migrates and runs locally with
   - Docker image is built from the prebuilt jar (codegen needs Docker, which can't run inside `docker build`).
   - Verified locally (JDK 25, **without Docker**, `-Djooq.codegen.skip=true`): `./mvnw clean verify` green: 7 backend tests, 2 frontend tests, ESLint/Prettier/tsc/Spotless checks; `ApplicationIT` skipped (no Docker).
   - **Not verified (Docker was not running):** jOOQ codegen via Testcontainers, `ApplicationIT`, `docker build`, `docker compose up`, CI run, **memory measurement (ADR-0006 budget ≤ 300 MB) still open**.
+- 2026-11-10 (Claude, with Docker): **verified.**
+  - `./mvnw verify` green with codegen: jOOQ ran against a throwaway PostgreSQL 18.6 via Testcontainers + Flyway (no classes yet: the baseline schema is empty until WP-20). 8 backend tests incl. `ApplicationIT` against a real PostgreSQL, plus the frontend checks.
+  - `docker compose up --build` (isolated test project, throwaway env): app healthy, `/api/system/info` and the SPA served.
+  - **Memory (ADR-0006, app + sidecar ≤ 300 MB):** idle app 174.5 MiB, after 4,000 requests (20 concurrent) 192.2 MiB of the 280 MiB limit; backup placeholder 0.5 MiB; no OOM, no restarts. **Within budget** (~193 MiB). PostgreSQL (excluded from the budget) 37 MiB idle. Measured on the MacBook (arm64), not on the reference machine; re-check there with real data in WP-32.
+  - Still open: CI workflow has never run (needs a push to the forge).
