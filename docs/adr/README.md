@@ -16,6 +16,7 @@ Written by me, reviewed by Claude.
 | [0003](0003-accounts.md) | Accounts model (kinds, hierarchy, scope, balances, closing) | Accepted | WP-34 |
 | [0004](0004-categories.md) | Category model & evolution | Accepted | WP-07 |
 | [0005](0005-architectural-style.md) | Architectural style & module boundaries | Accepted | WP-11 |
+| [0006](0006-tech-stack.md) | Tech stack | Accepted | WP-12 |
 
 ## Planned ADRs
 
@@ -29,7 +30,7 @@ Written by me, reviewed by Claude.
 | ~~Capture availability~~ (dropped: online-only, see Q12) | WP-36 |
 | Audit trail for transaction changes | WP-35 |
 | ~~Architectural style & module boundaries~~ → [ADR-0005](0005-architectural-style.md) | WP-11 |
-| Tech stack | WP-12 |
+| ~~Tech stack~~ → [ADR-0006](0006-tech-stack.md) | WP-12 |
 | Authentication (deferred to P2 with the login) | WP-14 |
 | Backup & restore | WP-15 |
 | Import source extensibility (maybe: YAGNI?) | WP-16 |

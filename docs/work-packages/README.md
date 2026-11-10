@@ -7,7 +7,7 @@ Status: todo / in progress / done / dropped / deferred (P2). Update the status h
 
 | For me                                                                                                                                                                                               | For Claude                                                                                                                                |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Answer the questions in [architecture-options.md](../architecture-options.md) → **[WP-11](WP-11-adr-architectural-style.md)** style, then **[WP-12](WP-12-adr-tech-stack.md)** stack | Review open: [WP-17](WP-17-design-system.md) design system |
+| **[WP-13](WP-13-c4-diagrams.md)** C4 diagrams (unlocked), then [WP-15](WP-15-adr-backup.md) backup ADR | **[WP-19](WP-19-project-skeleton.md)** project skeleton (unlocked); review open: [WP-17](WP-17-design-system.md) design system |
 
 ## Critical path to the MVP
 
@@ -32,7 +32,7 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | [WP-09](WP-09-er-diagram.md)                  | ER diagram for the MVP schema                          | `me`     | 2     | WP-05, WP-06, WP-07, WP-34 | done          |
 | [WP-10](WP-10-architecture-options.md)        | Architecture & tech-stack options paper                | `claude` | 3     | WP-03                      | done          |
 | [WP-11](WP-11-adr-architectural-style.md)     | ADR: Architectural style & module boundaries           | `me`     | 3     | WP-10, WP-04               | done          |
-| [WP-12](WP-12-adr-tech-stack.md)              | ADR: Tech stack                                        | `me`     | 3     | WP-10, WP-11               | todo          |
+| [WP-12](WP-12-adr-tech-stack.md)              | ADR: Tech stack                                        | `me`     | 3     | WP-10, WP-11               | done          |
 | [WP-13](WP-13-c4-diagrams.md)                 | C4 context & container diagrams                        | `me`     | 3     | WP-11, WP-12               | todo          |
 | [WP-14](WP-14-adr-authentication.md)          | ADR: Authentication                                    | `me`     | 3     | WP-12, WP-01               | deferred (P2) |
 | [WP-15](WP-15-adr-backup.md)                  | ADR: Backup & restore                                  | `me`     | 3     | WP-13                      | todo          |
