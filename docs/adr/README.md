@@ -15,6 +15,7 @@ Written by me, reviewed by Claude.
 | [0002](0002-transfers-and-corrections.md) | Transfers and balance corrections | Accepted | WP-05 |
 | [0003](0003-accounts.md) | Accounts model (kinds, hierarchy, scope, balances, closing) | Accepted | WP-34 |
 | [0004](0004-categories.md) | Category model & evolution | Accepted | WP-07 |
+| [0005](0005-architectural-style.md) | Architectural style & module boundaries | Accepted | WP-11 |
 
 ## Planned ADRs
 
@@ -27,7 +28,7 @@ Written by me, reviewed by Claude.
 | ~~Accounts model (hierarchy, derived vs. stored balances)~~ → [ADR-0003](0003-accounts.md) | WP-34 |
 | ~~Capture availability~~ (dropped: online-only, see Q12) | WP-36 |
 | Audit trail for transaction changes | WP-35 |
-| Architectural style & module boundaries | WP-11 |
+| ~~Architectural style & module boundaries~~ → [ADR-0005](0005-architectural-style.md) | WP-11 |
 | Tech stack | WP-12 |
 | Authentication (deferred to P2 with the login) | WP-14 |
 | Backup & restore | WP-15 |
