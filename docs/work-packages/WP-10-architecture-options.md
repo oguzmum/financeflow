@@ -4,7 +4,7 @@
 | -------------- | --------------------------------------------- |
 | **Owner**      | `claude`                                      |
 | **Phase**      | 3 · Architecture & stack                      |
-| **Status**     | todo                                          |
+| **Status**     | done                                                 |
 | **Depends on** | [WP-03](WP-03-quality-attribute-scenarios.md) |
 
 ## Goal
@@ -13,9 +13,9 @@ Lay out the realistic options so you can decide in WP-11/12. Options only, no re
 
 ## Definition of done
 
-- [ ] `docs/architecture-options.md` covering: architectural style (layered, hexagonal, modular monolith), backend language/framework candidates, data access (ORM vs. query builder vs. plain SQL), frontend (SSR + htmx vs. SPA vs. meta-framework), charts, auth approaches, deployment shape
-- [ ] Each option rated against the top quality attributes from WP-03 and your constraints
-- [ ] Questions for you at the end of each section
+- [x] `docs/architecture-options.md` covering: architectural style (layered, hexagonal, modular monolith), backend language/framework candidates, data access (ORM vs. query builder vs. plain SQL), frontend (SSR + htmx vs. SPA vs. meta-framework), charts, auth approaches, deployment shape
+- [x] Each option rated against the top quality attributes from WP-03 and your constraints
+- [x] Questions for you at the end of each section
 
 ## Notes
 
@@ -23,4 +23,5 @@ Inputs: you know Java / Spring / Maven / Angular from your day job. Reference ma
 
 ## Log
 
-_(decisions, links to ADRs/diagrams, review notes)_
+- 2026-11-10: Claude wrote [architecture-options.md](../architecture-options.md): style, backend (Spring Boot, Quarkus, Go, TypeScript, Python), data access, frontend, charts, auth (P2), deployment, example combinations. 19 questions for WP-11/12.
+- 2026-11-10: Reviewed and accepted.

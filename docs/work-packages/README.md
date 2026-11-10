@@ -7,7 +7,7 @@ Status: todo / in progress / done / dropped / deferred (P2). Update the status h
 
 | For me                                                                                                                                                                                               | For Claude                                                                                                                                |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase 2 done. Next: **[WP-03](WP-03-quality-attribute-scenarios.md)** QA scenarios (unlocks WP-10) | Review open: [WP-17](WP-17-design-system.md) design system; [WP-10](WP-10-architecture-options.md) options paper once WP-03 is done |
+| Answer the questions in [architecture-options.md](../architecture-options.md) → **[WP-11](WP-11-adr-architectural-style.md)** style, then **[WP-12](WP-12-adr-tech-stack.md)** stack | Review open: [WP-17](WP-17-design-system.md) design system |
 
 ## Critical path to the MVP
 
@@ -30,7 +30,7 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | [WP-07](WP-07-category-evolution.md)          | Category model & evolution                             | `me`     | 2     | WP-04, WP-02               | done          |
 | [WP-08](WP-08-import-identity.md)             | Migration identity & re-runnability                    | `me`     | 2     | WP-02, WP-04               | dropped       |
 | [WP-09](WP-09-er-diagram.md)                  | ER diagram for the MVP schema                          | `me`     | 2     | WP-05, WP-06, WP-07, WP-34 | done          |
-| [WP-10](WP-10-architecture-options.md)        | Architecture & tech-stack options paper                | `claude` | 3     | WP-03                      | todo          |
+| [WP-10](WP-10-architecture-options.md)        | Architecture & tech-stack options paper                | `claude` | 3     | WP-03                      | done          |
 | [WP-11](WP-11-adr-architectural-style.md)     | ADR: Architectural style & module boundaries           | `me`     | 3     | WP-10, WP-04               | todo          |
 | [WP-12](WP-12-adr-tech-stack.md)              | ADR: Tech stack                                        | `me`     | 3     | WP-10, WP-11               | todo          |
 | [WP-13](WP-13-c4-diagrams.md)                 | C4 context & container diagrams                        | `me`     | 3     | WP-11, WP-12               | todo          |
