@@ -2,7 +2,7 @@
 
 > **What this shows:** the core concepts of FinanceFlow and how they relate, in the terms of the [glossary](../domain/glossary.md).
 > **What it omits:** IDs, foreign keys, data types and tables (that's the ER diagram, WP-09); P2/P3 concepts (standing orders, projections, ETFs).
-> **Status:** WP-04 done. Decided since: money ([ADR-0001](../adr/0001-money-representation.md)), transfers and corrections ([ADR-0002](../adr/0002-transfers-and-corrections.md)). Open decisions are marked as notes and get resolved in WP-07 (categories) and WP-34 (accounts).
+> **Status:** WP-04 done. Decided since: money ([ADR-0001](../adr/0001-money-representation.md)), transfers and corrections ([ADR-0002](../adr/0002-transfers-and-corrections.md)), accounts ([ADR-0003](../adr/0003-accounts.md)). Open decisions are marked as notes and get resolved in WP-07 (categories).
 
 ```mermaid
 classDiagram
@@ -12,9 +12,9 @@ classDiagram
         class Account {
             <<entity>>
             name
-            type
-            closed
-            business
+            kind
+            scope
+            closedOn
         }
         class Booking {
             <<entity>>
@@ -70,7 +70,7 @@ classDiagram
 
     note for Booking "kind = income | expense | transfer | correction.\ntoAccount only for transfers,\ndirection only for corrections (ADR-0002)."
     note for Category "kind = income | expense.\ncostType (fixed | variable) only on\nexpense main categories (FR-CAT-2)."
-    note for Account "type: is 'sub-account' a type or just\nthe parent relation? (WP-34)\nbusiness: MVP rule FR-ACC-5."
+    note for Account "kind = checking | savings | cash | brokerage.\nscope = private | business; sub-account has\nits parent's scope. One level only (ADR-0003).""
 ```
 
 ## Decisions (WP-04)

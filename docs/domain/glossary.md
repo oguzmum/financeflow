@@ -8,11 +8,12 @@
 | German (UI) | English (code) | Definition | Not to be confused with |
 |---|---|---|---|
 | Konto | Account | A place where money sits and whose balance I want to know: bank account, cash, brokerage. | Category (where money *comes from or goes to*) |
-| Kontotyp | AccountType | What kind of account it is: checking, cash, brokerage, business. | — |
-| Unterkonto | SubAccount | An account that belongs to exactly one parent account (e.g. the emergency fund under the main bank account). Only one level of nesting. | A category's subcategory |
+| Kontoart | AccountKind | What kind of account it is: checking, savings, cash, brokerage. Fixed list; the account's name is free ([ADR-0003](../adr/0003-accounts.md)). | Sub-account (a relation), business (a scope) |
+| Bereich (privat / geschäftlich) | Scope (private / business) | Whose money an account holds. A sub-account always has its parent's scope ([ADR-0003](../adr/0003-accounts.md)). | Account kind |
+| Unterkonto | SubAccount | An account that has a parent account (e.g. the emergency fund under the main bank account). A relation, not a kind. Only one level of nesting. | A category's subcategory |
 | Kontogruppe / Gesamtsaldo | Group balance | Balance of a parent account plus all its sub-accounts. A computed figure, not a separate account. | — |
-| Geschlossenes Konto | Closed account | An account no longer in use. Hidden from capture and pickers; its history stays in all balances and reports. One-way, no reactivation. | Deleted account (history gone) |
-| Geschäftskonto | Business account | An account that belongs to the small business. Everything booked on it is business, everything else is private (MVP rule, FR-ACC-5). | — |
+| Geschlossenes Konto | Closed account | An account no longer in use, closed on a date with balance 0. No bookings after that date. Hidden from capture and pickers; its history stays in all balances and reports. One-way, no reactivation. | Deleted account (history gone) |
+| Geschäftskonto | Business account | An account with scope *business*. Everything booked on it is business, everything else is private (MVP rule, FR-ACC-5). A transfer to a private account is a plain transfer (owner withdrawal). | — |
 | Saldo | Balance | The amount of money on an account at a point in time. **Always derived** from the account's bookings, never typed in. | Balance correction |
 
 ## Bookings
@@ -81,7 +82,7 @@ Money Manager uses some words differently. These translations belong to the impo
 ## Open points (found while writing this)
 
 1. ~~"Transaction" collides with "database transaction"~~ **Decided (WP-04):** code term `Booking`.
-2. **Is "sub-account" a type or a relation?** FR-ACC-1 lists `sub-account` as an account *type*, but it's also defined by having a parent. An emergency-fund sub-account is still a savings/checking account. Probably the type is redundant → WP-34.
+2. ~~**Is "sub-account" a type or a relation?**~~ **Decided (WP-34, [ADR-0003](../adr/0003-accounts.md)):** a relation (parent reference). Kinds are checking, savings, cash, brokerage.
 3. ~~**One transfer, two accounts.**~~ **Decided (WP-05, [ADR-0002](../adr/0002-transfers-and-corrections.md)):** one booking with a source and a target account.
 4. ~~**Correction direction.**~~ **Decided (WP-06, [ADR-0001](../adr/0001-money-representation.md)):** positive amount + explicit direction (increase | decrease).
-5. **Business = account (MVP).** Fine for the migration, but a business expense paid from a private account would count as private. Acceptable for now → long-term in WP-34 (Q14).
+5. ~~**Business = account (MVP).**~~ **Decided (WP-34, [ADR-0003](../adr/0003-accounts.md)):** `scope` attribute on the account. A business expense paid from a private account still counts as private (Q14, accepted).
