@@ -23,7 +23,7 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | --------------------------------------------- | ------------------------------------------------------ | -------- | ----- | -------------------------- | ------------- |
 | [WP-01](WP-01-refine-requirements.md)         | Refine requirements & MVP scope                        | `me`     | 1     | —                          | done          |
 | [WP-02](WP-02-profile-csv-export.md)          | Profile the Money Manager export                       | `me`     | 1     | —                          | done          |
-| [WP-03](WP-03-quality-attribute-scenarios.md) | Quality attribute scenarios                            | `me`     | 1     | WP-01                      | todo          |
+| [WP-03](WP-03-quality-attribute-scenarios.md) | Quality attribute scenarios                            | `me`     | 1     | WP-01                      | done          |
 | [WP-04](WP-04-domain-model.md)                | Ubiquitous language & domain model                     | `me`     | 2     | WP-01, WP-02               | done        |
 | [WP-05](WP-05-transfers.md)                   | Model transfers between own accounts                   | `me`     | 2     | WP-04                      | done          |
 | [WP-06](WP-06-money-representation.md)        | ADR: Money representation & rounding                   | `me`     | 2     | WP-04                      | done          |

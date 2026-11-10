@@ -166,7 +166,9 @@ FinanceFlow replaces Money Manager for day-to-day capture.
 
 ## 4. Quality attributes
 
-To be turned into concrete, testable **quality attribute scenarios** (source → stimulus → environment → artifact → response → response measure) in [WP-03](work-packages/WP-03-quality-attribute-scenarios.md).
+Concrete, testable **quality attribute scenarios** and the utility tree: [`quality-scenarios.md`](quality-scenarios.md) (WP-03).
+
+**Top 3, in this order:** QA-7 data safety, QA-1 money correctness, QA-2 correct migration. They win every trade-off.
 
 | ID    | Attribute | Open domain question | Decided in |
 | ----- | --------- | -------------------- | ---------- |
@@ -176,9 +178,9 @@ To be turned into concrete, testable **quality attribute scenarios** (source →
 | QA-4  | **Category evolution** | Rename, split, merge without breaking history. Does history get re-categorized, or does it keep the old category? | WP-07 |
 | QA-5  | **Projections** | Computed on the fly or persisted? | P2 ADR |
 | QA-6  | **Extensible import sources** | Low priority: only one source, imported once. Other sources (e.g. Excel) only P3. | WP-16 |
-| QA-7  | **Data safety / backups** | **Critical:** FinanceFlow is the only copy of my financial history after cutover. Backup strategy, off-machine copy, retention, _tested_ restore. | WP-15 |
+| QA-7  | **Data safety / backups** | **Critical:** FinanceFlow is the only copy of my financial history after cutover. Backup strategy, off-machine copy, retention, _tested_ restore. **Measures (S-7.x):** loss ≤ 1 day on disk failure (nightly dump, automatic pull to the MacBook, no cloud); warning if the off-machine copy is > 3 days old; every backup restore-checked; usable again within a few days. | WP-15 |
 | QA-8  | **Security** | Network exposure (LAN/VPN only) for the MVP; login and session handling from P2 (FR-X-1). | WP-14 |
-| QA-9  | **Performance** | Reports over 10+ years of transactions stay fast (target: < 300 ms server time). | WP-03 / WP-25 |
+| QA-9  | **Performance** | Reports stay fast: **p95 < 300 ms server time** on the reference machine with 10× today's data (~150k bookings) (S-9.1). | WP-03 / WP-25 |
 | QA-10 | **Maintainability** | I'm a solo maintainer with limited evenings. Simple to run, simple to upgrade. | WP-11 / WP-12 |
 | QA-11 | **Usability (mobile)** | Capture of a transaction on the phone in < 15 s; main views usable on a phone. | WP-18 |
 | QA-12 | **Availability of capture** | **Online-only** (VPN connects fast). Remaining question: a flaky mobile connection must not create a duplicate when I tap "save" twice or the request is retried. | WP-35 |
