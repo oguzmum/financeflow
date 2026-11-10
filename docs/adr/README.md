@@ -17,6 +17,7 @@ Written by me, reviewed by Claude.
 | [0004](0004-categories.md) | Category model & evolution | Accepted | WP-07 |
 | [0005](0005-architectural-style.md) | Architectural style & module boundaries | Accepted | WP-11 |
 | [0006](0006-tech-stack.md) | Tech stack | Accepted | WP-12 |
+| [0007](0007-backup-and-restore.md) | Backup & restore | Accepted | WP-15 |
 
 ## Planned ADRs
 
@@ -32,6 +33,6 @@ Written by me, reviewed by Claude.
 | ~~Architectural style & module boundaries~~ → [ADR-0005](0005-architectural-style.md) | WP-11 |
 | ~~Tech stack~~ → [ADR-0006](0006-tech-stack.md) | WP-12 |
 | Authentication (deferred to P2 with the login) | WP-14 |
-| Backup & restore | WP-15 |
+| ~~Backup & restore~~ → [ADR-0007](0007-backup-and-restore.md) | WP-15 |
 | Import source extensibility (maybe: YAGNI?) | WP-16 |
 | Projections: computed vs. persisted | P2 |

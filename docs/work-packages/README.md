@@ -7,7 +7,7 @@ Status: todo / in progress / done / dropped / deferred (P2). Update the status h
 
 | For me                                                                                                                                                                                               | For Claude                                                                                                                                |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **[WP-15](WP-15-adr-backup.md)** backup ADR (unlocked) | **[WP-19](WP-19-project-skeleton.md)** project skeleton (unlocked); review open: [WP-17](WP-17-design-system.md) design system |
+| Phase 3 done. Next: **[WP-16](WP-16-import-pipeline-design.md)** migration pipeline design | **[WP-19](WP-19-project-skeleton.md)** project skeleton (unlocked, needs Docker); review open: [WP-17](WP-17-design-system.md) design system |
 
 ## Critical path to the MVP
 
@@ -35,7 +35,7 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | [WP-12](WP-12-adr-tech-stack.md)              | ADR: Tech stack                                        | `me`     | 3     | WP-10, WP-11               | done          |
 | [WP-13](WP-13-c4-diagrams.md)                 | C4 context & container diagrams                        | `me`     | 3     | WP-11, WP-12               | done          |
 | [WP-14](WP-14-adr-authentication.md)          | ADR: Authentication                                    | `me`     | 3     | WP-12, WP-01               | deferred (P2) |
-| [WP-15](WP-15-adr-backup.md)                  | ADR: Backup & restore                                  | `me`     | 3     | WP-13                      | todo          |
+| [WP-15](WP-15-adr-backup.md)                  | ADR: Backup & restore                                  | `me`     | 3     | WP-13                      | done          |
 | [WP-16](WP-16-import-pipeline-design.md)      | Migration pipeline design & sequence diagram           | `me`     | 4     | WP-07, WP-11               | todo          |
 | [WP-17](WP-17-design-system.md)               | Design system artifact                                 | `claude` | 5     | WP-01                      | in progress   |
 | [WP-18](WP-18-mvp-screen-design.md)           | MVP screen designs                                     | `claude` | 5     | WP-17, WP-16               | todo          |
