@@ -15,7 +15,7 @@ Implement the ER design from WP-09 as versioned migrations.
 
 - [ ] Migrations create all MVP tables, constraints and indexes
 - [ ] No category seed (requirements §2.4). Only what the app technically needs to start
-- [ ] Constraint tests: invalid data is rejected by the DB (e.g. transfer legs don't sum to 0)
+- [ ] Constraint tests: invalid data is rejected by the DB, covering every DB-enforced invariant in [er-mvp.md](../diagrams/er-mvp.md) (start from `er-mvp-checks/constraint-tricks.sql`, e.g. sub-account with another scope, expense on an income category, transfer without target)
 - [ ] Reviewed by Claude
 
 ## Learning goals & concepts
