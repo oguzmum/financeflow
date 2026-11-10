@@ -13,7 +13,8 @@ Written by me, reviewed by Claude.
 |---|---|---|---|
 | [0001](0001-money-representation.md) | Money representation & rounding | Accepted | WP-06 |
 | [0002](0002-transfers-and-corrections.md) | Transfers and balance corrections | Accepted | WP-05 |
-| [0003](0003-accounts.md) | Accounts model (kinds, hierarchy, scope, balances, closing) | Proposed | WP-34 |
+| [0003](0003-accounts.md) | Accounts model (kinds, hierarchy, scope, balances, closing) | Accepted | WP-34 |
+| [0004](0004-categories.md) | Category model & evolution | Accepted | WP-07 |
 
 ## Planned ADRs
 
@@ -21,7 +22,7 @@ Written by me, reviewed by Claude.
 |---|---|
 | ~~Money representation & rounding~~ → [ADR-0001](0001-money-representation.md) | WP-06 |
 | ~~Transfers between own accounts~~ → [ADR-0002](0002-transfers-and-corrections.md) | WP-05 |
-| Category evolution (rename/split/merge) | WP-07 |
+| ~~Category evolution (rename/split/merge)~~ → [ADR-0004](0004-categories.md) | WP-07 |
 | ~~Migration identity & re-runnability~~ (dropped: reset and re-run, FR-IMP-3) | WP-08 |
 | ~~Accounts model (hierarchy, derived vs. stored balances)~~ → [ADR-0003](0003-accounts.md) | WP-34 |
 | ~~Capture availability~~ (dropped: online-only, see Q12) | WP-36 |

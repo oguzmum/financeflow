@@ -4,7 +4,7 @@
 | -------------- | -------------------------------------------------------------------- |
 | **Owner**      | `me`                                                                 |
 | **Phase**      | 2 · Domain model                                                     |
-| **Status**     | in progress                                                          |
+| **Status**     | done                                                                 |
 | **Depends on** | [WP-04](WP-04-domain-model.md), [WP-02](WP-02-profile-csv-export.md) |
 
 ## Goal
@@ -18,7 +18,7 @@ Model the accounts from requirements §2.3: sub-accounts, cash, brokerage, busin
 - [x] Answered: balances are only ever derived, with no manual snapshots (FR-OV-4). So how would I notice a missed or wrong entry? Is an occasional "compare with bank balance" check worth having?
 - [x] Decided: how the brokerage account separates _cash flows_ (MVP) from _holdings and market value_ (P2), without designing P2 in full
 - [x] Decided: how business vs. private is modeled (FR-ACC-5): an account attribute, a separate "book"/ledger, or something else? What happens to a transfer between the business account and a private account?
-- [ ] ADR written and reviewed (written: [ADR-0003](../adr/0003-accounts.md), Proposed; review pending)
+- [x] ADR written and reviewed ([ADR-0003](../adr/0003-accounts.md), Accepted)
 
 ## Learning goals & concepts
 
@@ -42,3 +42,4 @@ Model the accounts from requirements §2.3: sub-accounts, cash, brokerage, busin
   - Business ↔ private = plain transfer (owner withdrawal/deposit in the P2 business view).
   - Brokerage: cash flows only; P2 holdings reference the account.
   - Closing: balance 0, no bookings after `closedOn`, a parent closes its sub-accounts in one step.
+- 2026-11-10: Reviewed. Claude's additions accepted (unique names, no edits that change a closed account's final balance, group close all-or-nothing, brokerage balance label). ADR-0003 Accepted.

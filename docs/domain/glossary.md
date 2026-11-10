@@ -38,7 +38,8 @@
 | Hauptkategorie | Main category | Top level of the category tree. Totals are shown per main category. | — |
 | Unterkategorie | Subcategory | Optional second level under exactly one main category. | Sub-account |
 | Einnahmen- / Ausgabenkategorie | Income / expense category | Two separate trees. An income category can't be used for an expense, and vice versa. | — |
-| Fixkosten / variable Ausgaben | Fixed / variable (cost type) | Classification of every **expense main category**: either fixed or variable, never both. | — |
+| Fixkosten / variable Ausgaben | Fixed / variable (cost type) | Classification of every **expense main category**: either fixed or variable, never both. Subcategories inherit it ([ADR-0004](../adr/0004-categories.md)). | — |
+| Archivierte Kategorie | Archived category | A category no longer offered for capture. Its history stays in all reports. Reversible. Also used for old Money Manager categories with no equivalent today. | Deleted category (only possible without bookings) |
 
 ## Migration (import from Money Manager)
 
@@ -47,7 +48,8 @@
 | Migration | Migration | The one-time transfer of the full Money Manager history into FinanceFlow. | Export |
 | Importlauf | Import run | One execution of the migration: read file → preview → confirm. Before cutover it can be reset and repeated. | — |
 | Vorschau | Preview | What an import run *would* do: rows to import, unmapped rows, invalid rows. Nothing is persisted yet. | — |
-| Zuordnung | Mapping | A persistent rule that translates a Money Manager value to a FinanceFlow one: (type, category, subcategory) → category, or account name → account. Survives a database reset. | — |
+| Zuordnung | Mapping | A persistent rule that translates a Money Manager value to a FinanceFlow one: (type, category, subcategory) → category, or account name → account. Stored in the private **migration file** by name path (not ID), so it survives a database reset ([ADR-0004](../adr/0004-categories.md)). | — |
+| Migrationsdatei | Migration file | Private, git-ignored file with the target category tree, the accounts and all mappings. Reset → seed from it → import. Obsolete after cutover. | Export |
 | Quellzeile | Source row | One row of the CSV file, exactly as Money Manager wrote it. | Booking |
 | Abgelehnte Zeile | Rejected row | A source row that can't be imported, with the reason. | — |
 | Umstellung | Cutover | The fixed date after which only FinanceFlow is used. | — |

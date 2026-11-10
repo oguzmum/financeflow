@@ -1,6 +1,6 @@
 # ADR-0003: Accounts model (kinds, hierarchy, scope, balances, closing)
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-10
 - **Related:** FR-ACC-0, FR-ACC-1, FR-ACC-2, FR-ACC-3, FR-ACC-4, FR-ACC-5, FR-ACC-8, FR-OV-4, QA-1, QA-3, ADR-0001, ADR-0002, WP-34, WP-09
 

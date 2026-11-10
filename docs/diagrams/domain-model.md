@@ -2,7 +2,7 @@
 
 > **What this shows:** the core concepts of FinanceFlow and how they relate, in the terms of the [glossary](../domain/glossary.md).
 > **What it omits:** IDs, foreign keys, data types and tables (that's the ER diagram, WP-09); P2/P3 concepts (standing orders, projections, ETFs).
-> **Status:** WP-04 done. Decided since: money ([ADR-0001](../adr/0001-money-representation.md)), transfers and corrections ([ADR-0002](../adr/0002-transfers-and-corrections.md)), accounts ([ADR-0003](../adr/0003-accounts.md)). Open decisions are marked as notes and get resolved in WP-07 (categories).
+> **Status:** WP-04 done. Decided since: money ([ADR-0001](../adr/0001-money-representation.md)), transfers and corrections ([ADR-0002](../adr/0002-transfers-and-corrections.md)), accounts ([ADR-0003](../adr/0003-accounts.md)), categories ([ADR-0004](../adr/0004-categories.md)).
 
 ```mermaid
 classDiagram
@@ -35,6 +35,7 @@ classDiagram
             name
             kind
             costType
+            archived
         }
     }
 
@@ -44,6 +45,7 @@ classDiagram
             sourceType
             sourceCategory
             sourceSubcategory
+            targetPath
         }
         class AccountMapping {
             <<entity>>
@@ -69,7 +71,7 @@ classDiagram
     ImportRun ..> Booking : creates
 
     note for Booking "kind = income | expense | transfer | correction.\ntoAccount only for transfers,\ndirection only for corrections (ADR-0002)."
-    note for Category "kind = income | expense.\ncostType (fixed | variable) only on\nexpense main categories (FR-CAT-2)."
+    note for Category "kind = income | expense; sub has parent's kind.\ncostType (fixed | variable) only on expense\nmain categories. One level only (ADR-0004)."
     note for Account "kind = checking | savings | cash | brokerage.\nscope = private | business; sub-account has\nits parent's scope. One level only (ADR-0003).""
 ```
 
@@ -87,5 +89,6 @@ classDiagram
 - **Account** has an optional parent: one level only (FR-ACC-1). The group balance is computed, so there's no "AccountGroup" class.
 - **Balance** isn't in the diagram on purpose: it's derived from bookings.
 - **Booking → Account**: always one `account`; transfers also have a `toAccount` (ADR-0002).
-- **Booking → Category `0..1`**: transfers and corrections have no category; income and expenses always have one (FR-CAT-1).
+- **Booking → Category `0..1`**: transfers and corrections have no category; income and expenses always have one (FR-CAT-1). It points to the most specific category (sub if any); the main category is derived via the parent (ADR-0004).
+- **Mapping → Category**: conceptually; in practice the mapping lives in the private migration file and targets a name path, because IDs don't survive a reset (ADR-0004).
 - **ImportRun** has no `<<entity>>` marking: it may not need to be persisted at all (preview → confirm, then it's gone). Decide in WP-16.

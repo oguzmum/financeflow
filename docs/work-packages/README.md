@@ -7,7 +7,7 @@ Status: todo / in progress / done / dropped / deferred (P2). Update the status h
 
 | For me                                                                                                                                                                                               | For Claude                                                                                                                                |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Unlocked by WP-04, any order: **[WP-07](WP-07-category-evolution.md)** categories, **[WP-34](WP-34-accounts-model.md)** accounts. Also **[WP-03](WP-03-quality-attribute-scenarios.md)** QA scenarios | [WP-17](WP-17-design-system.md) design system (unlocked); [WP-10](WP-10-architecture-options.md) options paper once WP-03 is done |
+| Phase 2 complete except **[WP-09](WP-09-er-diagram.md)** ER diagram (now unlocked). Also **[WP-03](WP-03-quality-attribute-scenarios.md)** QA scenarios | Review open: [WP-17](WP-17-design-system.md) design system; [WP-10](WP-10-architecture-options.md) options paper once WP-03 is done |
 
 ## Critical path to the MVP
 
@@ -27,7 +27,7 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | [WP-04](WP-04-domain-model.md)                | Ubiquitous language & domain model                     | `me`     | 2     | WP-01, WP-02               | done        |
 | [WP-05](WP-05-transfers.md)                   | Model transfers between own accounts                   | `me`     | 2     | WP-04                      | done          |
 | [WP-06](WP-06-money-representation.md)        | ADR: Money representation & rounding                   | `me`     | 2     | WP-04                      | done          |
-| [WP-07](WP-07-category-evolution.md)          | Category model & evolution                             | `me`     | 2     | WP-04, WP-02               | todo          |
+| [WP-07](WP-07-category-evolution.md)          | Category model & evolution                             | `me`     | 2     | WP-04, WP-02               | done          |
 | [WP-08](WP-08-import-identity.md)             | Migration identity & re-runnability                    | `me`     | 2     | WP-02, WP-04               | dropped       |
 | [WP-09](WP-09-er-diagram.md)                  | ER diagram for the MVP schema                          | `me`     | 2     | WP-05, WP-06, WP-07, WP-34 | todo          |
 | [WP-10](WP-10-architecture-options.md)        | Architecture & tech-stack options paper                | `claude` | 3     | WP-03                      | todo          |
@@ -54,7 +54,7 @@ WP-01/02 → WP-04 → WP-05/06/07/34 → WP-09 → WP-11/12 → WP-19 → WP-20
 | [WP-31](WP-31-frontend-income-expenses.md)    | Frontend: income & expenses views (private + business) | `claude` | 7     | WP-28, WP-25               | todo          |
 | [WP-32](WP-32-production-deployment.md)       | Deployment & backups                                   | `claude` | 7     | WP-15, WP-27, WP-28        | todo          |
 | [WP-33](WP-33-mvp-acceptance.md)              | Migration, cutover & acceptance                        | `me`     | 6     | WP-30, WP-31, WP-32, WP-37 | todo          |
-| [WP-34](WP-34-accounts-model.md)              | Accounts model: types, hierarchy, balances             | `me`     | 2     | WP-04, WP-02               | in progress   |
+| [WP-34](WP-34-accounts-model.md)              | Accounts model: types, hierarchy, balances             | `me`     | 2     | WP-04, WP-02               | done          |
 | [WP-35](WP-35-transaction-write-model.md)     | Transaction write model: capture, edit, delete         | `me`     | 6     | WP-05, WP-20, WP-21        | todo          |
 | [WP-36](WP-36-adr-capture-availability.md)    | ADR: Capture availability (online-only vs. offline)    | `me`     | 3     | WP-03, WP-01               | dropped       |
 | [WP-37](WP-37-frontend-capture.md)            | Frontend: quick capture & transaction list             | `claude` | 7     | WP-28, WP-35               | todo          |
